@@ -11,6 +11,7 @@ import { GameScene } from './scenes/GameScene.js';
 import { initLayout } from './ui/layout.js';
 import { initMenu } from './ui/menu.js';
 import { initHud } from './ui/hud.js';
+import { initStats } from './ui/stats.js';
 
 async function start() {
   // Phaser text needs the font ready before it draws.
@@ -19,6 +20,7 @@ async function start() {
   const root = document.getElementById('ui');
   initMenu(root);
   initHud(root);
+  initStats(root);
 
   const game = new Phaser.Game({
     type: Phaser.AUTO,

@@ -19,7 +19,7 @@ Build mode: fast
   Learner check: Run `npm run dev`, open http://localhost:5173, press PLAY, click the castle a few times. You should see 4 dirt paths leading to a cave-style castle and the money in the top-right going up with a "+money" pop-up each click.
   Commit: `Add playable map with clickable castle and money HUD`
 
-- [ ] **2. Enemies attack from all 4 directions and can destroy the castle**
+- [x] **2. Enemies attack from all 4 directions and can destroy the castle**
   Becomes usable: Waves of Era 1 enemies start automatically, spawn at all 4 map edges, walk their lanes to the castle, damage it, and vanish. The health bar drops; at 0 the Defeat Stats Screen shows time, kills, and money, with Play Again and Main Menu.
   Why now: Completes the second kernel piece (4-direction attack) and gives the game a real start-to-end loop, so every later slice is tested inside a game that can actually be lost.
   PRD ref: `prd.md > The Core Journey` (steps 6, 8, 11), `prd.md > Waves and Enemies`, `prd.md > Stats Screen`
