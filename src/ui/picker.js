@@ -10,6 +10,7 @@ export function initPicker(root) {
   root.appendChild(el);
   let state = null;
   let cell = null;
+  let lastHtml = '';
 
   const close = () => {
     if (el.classList.contains('hidden')) return;
@@ -49,7 +50,11 @@ export function initPicker(root) {
       .join('');
     const stuck = ids.every((id) => !(state.inventory[id] > 0) && state.money < trapDef(id).price);
     const hint = stuck ? '<div class="picker-empty">Not enough money — tap the castle to earn more!</div>' : '';
-    show(cell.x, cell.y, `<div class="picker-row">${buttons}</div>${hint}`);
+    const html = `<div class="picker-row">${buttons}</div>${hint}`;
+    // Only rebuild when something visible changed, so a press mid-update isn't lost.
+    if (html === lastHtml && !el.classList.contains('hidden')) return;
+    lastHtml = html;
+    show(cell.x, cell.y, html);
   };
 
   bus.on('state:changed', (s) => {

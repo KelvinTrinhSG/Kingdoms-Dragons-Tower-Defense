@@ -570,6 +570,12 @@ body {
   gap: 0.25em;
 }
 
+/* It sits over the north path: let taps fall through to the path cells
+   unless the Upgrade button is actually usable. */
+#ui .upgrade-btn:disabled {
+  pointer-events: none;
+}
+
 .upgrade-btn {
   display: flex;
   flex-direction: column;

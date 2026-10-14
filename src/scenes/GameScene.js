@@ -10,7 +10,7 @@ import { castleHit, hitTrap } from '../logic/combat.js';
 import { buildWave, nextWave } from '../logic/waves.js';
 import { BALANCE } from '../data/balance.js';
 import { eraData, trapDef } from '../data/eras.js';
-import { popText, banner } from '../art/fx.js';
+import { popText, banner, FONT } from '../art/fx.js';
 import { ART_RES } from '../art/palette.js';
 
 const HP_BAR = { x: CASTLE_CENTER.x, y: 286, w: 120, h: 14 };
@@ -42,6 +42,7 @@ export class GameScene extends Phaser.Scene {
     this.hpBar = this.add.graphics().setDepth(5000);
     this.drawHpBar();
     this.setupCellTaps();
+    this.setupCountdown();
 
     this.listen('ui:buyTrap', (id) => {
       if (buyTrap(this.state, id)) this.emitState();
@@ -115,6 +116,8 @@ export class GameScene extends Phaser.Scene {
     castle.setInteractive({ hitArea: hit, hitAreaCallback: Phaser.Geom.Circle.Contains, useHandCursor: true });
     const base = 1 / ART_RES;
     castle.on('pointerdown', (pointer) => {
+      // Phaser also hit-tests presses on the HTML overlay (picker, buttons) above the castle; ignore those.
+      if (pointer.downElement !== this.game.canvas) return;
       const gained = clickCastle(this.state);
       if (!gained) return;
       popText(this, pointer.worldX, pointer.worldY - 10, `+${gained}`);
@@ -153,6 +156,35 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  // "Get ready" notice from Play until Wave 1 starts, so the player knows how long they have to prepare.
+  // It is plain text (not interactive), so taps still reach the castle and path cells under it.
+  setupCountdown() {
+    const style = (size, color) => ({
+      fontFamily: FONT,
+      fontSize: `${size}px`,
+      fontStyle: '700',
+      color,
+      stroke: '#141F3D',
+      strokeThickness: Math.round(size / 5),
+    });
+    const title = this.add.text(0, 0, 'GET READY!', style(48, '#FFF04D')).setOrigin(0.5);
+    const timer = this.add.text(0, 48, '', style(26, '#FFFFFF')).setOrigin(0.5);
+    const box = this.add.container(640, 130, [title, timer]).setDepth(10001);
+    this.countdown = { box, timer, shown: null };
+    this.tickCountdown();
+  }
+
+  tickCountdown() {
+    const c = this.countdown;
+    if (!c) return;
+    const n = Math.max(1, Math.ceil(this.breakLeft));
+    if (n === c.shown) return;
+    c.shown = n;
+    c.timer.setText(`Enemies arrive in ${n}s`);
+    c.timer.setScale(1.25);
+    this.tweens.add({ targets: c.timer, scale: 1, duration: 250, ease: 'Back.easeOut' });
+  }
+
   drawHpBar() {
     const { x, y, w, h } = HP_BAR;
     const ratio = this.state.castleHp / this.state.castleMaxHp;
@@ -173,6 +205,10 @@ export class GameScene extends Phaser.Scene {
   // ---- Waves ----
 
   startWave() {
+    if (this.countdown) {
+      this.countdown.box.destroy();
+      this.countdown = null;
+    }
     const w = buildWave(this.state.era, this.state.wave);
     this.pending = w.spawns;
     this.waveMods = { hpMul: w.hpMul, speedMul: w.speedMul, rewardMul: w.rewardMul };
@@ -267,6 +303,7 @@ export class GameScene extends Phaser.Scene {
     if (this.phase === 'break') {
       this.breakLeft -= dt;
       if (this.breakLeft <= 0) this.startWave();
+      else this.tickCountdown();
     } else if (this.phase === 'wave') {
       this.waveClock += dt;
       while (this.pending.length && this.pending[0].delay <= this.waveClock && this.enemies.length < BALANCE.maxEnemiesAlive) {
