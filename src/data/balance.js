@@ -8,6 +8,7 @@ export const BALANCE = {
   // waves: start small, slow, and weak; every wave adds enemies, health, and speed
   firstWaveDelay: 6, // seconds before Wave 1
   waveBreak: 3, // seconds between waves
+  upgradeBreak: 7, // seconds after an era upgrade before Wave 1 of the new era
   waveBaseCount: 3,
   waveCountGrowth: 1.15, // extra enemies per wave number (Wave 20 = 24)
   spawnIntervalStart: 1.8, // seconds between spawns in Wave 1

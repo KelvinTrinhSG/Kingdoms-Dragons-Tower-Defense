@@ -16,10 +16,10 @@ Source: `scope.md > What "Working" Looks Like`.
 3. The player clicks the castle to earn **money**.
 4. The player can open the **Shop** (button on the middle of the left edge) to buy traps of the current era ahead of time; they go into the **Inventory**.
 5. The player taps a path cell. A picker shows the current era's 3 traps: owned ones with their Inventory counts, unowned ones with their price (dimmed if unaffordable). Tapping one places that trap on the cell, buying it on the spot if it isn't owned.
-6. Waves start automatically. Enemies spawn at the map edges and walk the 4 paths toward the castle. Stepping on a trap damages the enemy and uses up one of the trap's uses.
+6. A **"GET READY!"** notice counts down the seconds until Wave 1, then waves start automatically. Enemies spawn at the map edges and walk the 4 paths toward the castle. Stepping on a trap damages the enemy and uses up one of the trap's uses.
 7. Killed enemies drop **stone, wood, and gold** plus some **money**, which are added to the player's resources.
 8. Enemies that reach the castle damage it and disappear.
-9. When the player has enough resources, they press **Upgrade** (above the castle's health bar) at any time. The castle evolves to the next era, its health is restored, the map's buildings and trees change to the new era, the Shop offers the new era's traps, and the next wave is **Wave 1 of the new era**. All old-era traps (on the map and in the Inventory) disappear and are converted into money, and the player gets a bonus worth 2 of the new era's cheapest trap.
+9. When the player has enough resources, they press **Upgrade** (above the castle's health bar) at any time. The castle evolves to the next era, its health is restored, the map's buildings and trees change to the new era, the Shop offers the new era's traps, and the next wave is **Wave 1 of the new era**. All old-era traps (on the map and in the Inventory) disappear and are converted into money, and the player gets a bonus worth 2 of the new era's cheapest trap. Old-era enemies still on the map are cleared and count as kills (with their drops). The new era's name and a countdown show until its Wave 1 starts.
 10. If the player finishes Wave 20 of an era without upgrading, the next waves keep repeating that era's Wave 20 until they upgrade.
 11. **Win:** surviving Wave 20 of Era 5 (Modern Barracks). **Lose:** castle health reaches 0. Either way, the **Stats Screen** appears.
 
@@ -73,6 +73,7 @@ Source: `scope.md > Inspiration & Identity`. Already decided in scope; not re-as
 
 ### Waves and Enemies
 - Waves start automatically one after another. Enemies come from all 4 directions.
+- Before Wave 1, a **"GET READY!"** notice at the top of the map counts down the seconds left (6 s) so the player can earn money and place traps first.
 - Each era has **3 enemy types**. Each era has **20 waves**, getting harder as they go: early waves have few, slow, low-health enemies; each later wave brings more enemies that move faster and have more health.
 - Killed enemies drop stone, wood, and gold, plus money. Tougher enemies give more money: heavier types more than lighter ones, and later waves more than earlier ones.
 - An enemy reaching the castle damages it and disappears.
@@ -80,6 +81,7 @@ Source: `scope.md > Inspiration & Identity`. Already decided in scope; not re-as
   - [ ] Killing an enemy increases stone/wood/gold and money.
   - [ ] A heavy enemy or a later-wave enemy gives more money than a light, early one.
   - [ ] Wave 1 has fewer, slower, weaker enemies than later waves.
+  - [ ] After pressing Play, a countdown shows the seconds until Wave 1, and no enemy appears before it ends.
   - [ ] An enemy reaching the castle lowers the castle's health bar and vanishes.
 
 ### Speed Button
@@ -91,6 +93,8 @@ Source: `scope.md > Inspiration & Identity`. Already decided in scope; not re-as
 - Upgrading: spends the resources, moves the castle to the next era (new castle art), **restores castle health**, swaps the map's buildings and trees to the new era, switches the Shop to the new era's traps, and makes the next wave **Wave 1 of the new era** with the new era's enemies.
 - **Old traps are cashed out:** every old-era trap, both placed on the map and still in the Inventory, disappears and is converted into money for the player (Assumption: refund = trap price × remaining uses ÷ total uses).
 - **Era bonus:** on each upgrade the player also receives money equal to the price of **2 of the new era's cheapest trap**.
+- **Old enemies are cleared:** old-era enemies still on the map vanish as kills — the player gets their money and stone/wood/gold, and the kill count goes up.
+- **Breather:** the new era's name (e.g., "WOODEN FORT!") and "Enemies arrive in Ns" count down a 7 s break before Wave 1 of the new era.
 - Era 5 is the last; there is no upgrade beyond it.
 - Eras: **1 Prehistoric Cave → 2 Wooden Fort (feudal) → 3 Stone Castle → 4 Pre-modern Barracks → 5 Modern Barracks.**
   - [ ] With enough resources, pressing Upgrade changes the castle, map scenery, Shop traps, and enemy types to the next era, and refills castle health.
@@ -98,6 +102,7 @@ Source: `scope.md > Inspiration & Identity`. Already decided in scope; not re-as
   - [ ] After finishing Wave 20 without upgrading, the next wave repeats Wave 20 of the same era.
   - [ ] After an upgrade, no old-era traps remain on the map or in the Inventory, and money increases by their refund plus the era bonus.
   - [ ] The era bonus alone is enough to buy 2 of the new era's cheapest trap.
+  - [ ] After an upgrade, no old-era enemies remain on the map, their drops are added, and the new era's name counts down to its Wave 1.
 
 ### Era Roster
 Pattern in every era: a fast/light enemy, a standard enemy, a heavy enemy; the cheap trap counters the fast enemy, the mid trap the standard enemy, the expensive trap the heavy enemy.
@@ -139,6 +144,8 @@ Pattern in every era: a fast/light enemy, a standard enemy, a heavy enemy; the c
 - Era Roster: the proposed enemy and trap names were accepted ("PRD ổn").
 - Enemies reaching the castle damage it and disappear.
 - Waves start automatically; a speed button exists so a full run fits a demo.
+- On-screen countdowns before Wave 1 of a run and of each new era, and a longer 7 s break after an upgrade, so the player always knows how long they have to prepare (learner request after the final review).
+- On upgrade, old-era enemies are cleared as kills with rewards — the new era starts on a clean map and the player isn't punished for upgrading mid-wave (learner choice).
 - Stats screen: time to finish, enemies killed, money remaining.
 - HUD layout: wave top-left, resources top-right, Shop button middle-left, health bar above the castle, Upgrade button above the health bar.
 

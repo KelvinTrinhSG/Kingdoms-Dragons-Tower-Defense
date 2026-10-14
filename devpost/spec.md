@@ -30,7 +30,7 @@ PRD ref: `prd.md > The Core Journey`.
 6. **Waves** → the **wave manager** builds each wave from the era data and spawns enemies at the 4 map edges → each enemy walks its lane toward the castle each frame → when it enters a cell with a trap it hasn't hit yet, the trap deals damage (extra against its countered type) and loses 1 use; at 0 uses it is removed.
 7. **Enemy dies** → its stone/wood/gold drop plus money (scaled by the wave's toughness) is added to the state and pops up → `state:changed` → HUD updates; the kill counter goes up.
 8. **Enemy reaches the castle** → castle health drops; the enemy is removed → the health bar above the castle updates.
-9. **Press Upgrade** (enabled only when affordable) → `ui:upgrade` → economy logic spends the resources, refunds every old-era trap (map and Inventory) as money, adds the era bonus, refills castle health, moves to the next era → `GameScene` redraws castle and scenery for the new era → the Shop lists the new era's traps → the wave manager makes the next wave Wave 1 of the new era.
+9. **Press Upgrade** (enabled only when affordable) → `ui:upgrade` → economy logic spends the resources, refunds every old-era trap (map and Inventory) as money, adds the era bonus, refills castle health, moves to the next era → `GameScene` clears old-era enemies through `killEnemy` (drops and kill count included), redraws castle and scenery for the new era, and shows the era-name countdown → the Shop lists the new era's traps → after `upgradeBreak` (7 s) the wave manager starts Wave 1 of the new era.
 10. **Wave 20 finished without upgrading** → the wave manager repeats that era's Wave 20.
 11. **Game ends** → castle health 0 → `game:over` (lose); Era 5 Wave 20 cleared → `game:over` (win) → `GameScene` pauses → the interface shows the **Stats Screen** with time, kills, and money remaining, plus Play Again and Main Menu buttons.
 
@@ -107,7 +107,7 @@ Pure functions, unit-tested: `trapDamage(trap, enemy)` (base damage × counter m
 PRD ref: `prd.md > Traps in Action`, `prd.md > Waves and Enemies`.
 
 ### Wave Manager (`src/logic/waves.js` + used by `GameScene`)
-`buildWave(era, waveNumber)` returns a list of spawns (enemy type, direction, lane, delay) from the era data plus health, speed, and reward multipliers: Wave 1 is small, slow, and weak; enemy count, health, and speed grow with the wave number; heavier enemies appear more in later waves; the money reward grows with the health multiplier; enemies are spread across all 4 directions. Unit-tested. `GameScene` runs the spawn timer, detects wave end (all spawned and none alive), waits a short break (~3 s), then starts the next wave: Wave + 1, or Wave 20 again if Wave 20 just ended without an upgrade. Clearing Era 5 Wave 20 triggers a win.
+`buildWave(era, waveNumber)` returns a list of spawns (enemy type, direction, lane, delay) from the era data plus health, speed, and reward multipliers: Wave 1 is small, slow, and weak; enemy count, health, and speed grow with the wave number; heavier enemies appear more in later waves; the money reward grows with the health multiplier; enemies are spread across all 4 directions. Unit-tested. `GameScene` runs the spawn timer, detects wave end (all spawned and none alive), waits a short break (~3 s), then starts the next wave: Wave + 1, or Wave 20 again if Wave 20 just ended without an upgrade. Clearing Era 5 Wave 20 triggers a win. Before Wave 1 of a run (`firstWaveDelay`, 6 s) and of each new era (`upgradeBreak`, 7 s), `setupCountdown`/`tickCountdown` show a non-interactive Phaser text notice — "GET READY!" or the new era's name, plus "Enemies arrive in Ns" — removed when the wave starts.
 PRD ref: `prd.md > Waves and Enemies`, `prd.md > Castle Upgrade and Eras`.
 
 ### Grid and Paths (`src/world/grid.js`)
@@ -144,7 +144,7 @@ Plain DOM modules, each rendering into `#ui` and talking only through the bus:
 
 ### Game Data (`src/data/`)
 - `eras.js` — the 5 eras: name, palette key, castle health, upgrade cost to the *next* era (stone/wood/gold), the 3 enemies (id, name, role, health, speed, castle damage, drop of stone/wood/gold, base money reward), the 3 traps (id, name, price, uses 1/3/5, base damage, countered enemy id). Names from `prd.md > Era Roster`.
-- `balance.js` — starting money, money per click, counter multiplier, wave growth, spawn interval, break between waves, wave count per era (20), speed levels (1, 2, 4).
+- `balance.js` — starting money, money per click, counter multiplier, wave growth, spawn interval, first-wave delay, break between waves, break after an upgrade, wave count per era (20), speed levels (1, 2, 4).
 PRD ref: `prd.md > Era Roster`, `prd.md > Open Questions` (balance numbers).
 
 ### Deployment (`vite.config.js`, `.github/workflows/deploy.yml`)

@@ -74,10 +74,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   // Evolve the castle: old traps are cashed out, the world redraws in the new era,
-  // and the next wave is Wave 1 of that era. Enemies already walking keep going.
+  // and the next wave is Wave 1 of that era. Old-era enemies still on the map are
+  // cleared as kills (with their drops), so the new era starts on a clean map.
   upgrade() {
     const result = applyUpgrade(this.state);
     if (!result) return;
+    this.enemies.filter((e) => !e.dead).forEach((e) => this.killEnemy(e));
     this.trapViews.forEach((v) => v.destroy());
     this.trapViews.clear();
     this.selection.setVisible(false);
@@ -86,7 +88,7 @@ export class GameScene extends Phaser.Scene {
     // the current wave stops spawning; a short break, then Wave 1 of the new era
     this.pending = [];
     this.phase = 'break';
-    this.breakLeft = BALANCE.waveBreak + 1;
+    this.breakLeft = BALANCE.upgradeBreak;
 
     const castle = this.world.castle;
     const base = 1 / ART_RES;
@@ -94,7 +96,7 @@ export class GameScene extends Phaser.Scene {
     castle.setScale(base * 0.6);
     this.tweens.add({ targets: castle, scale: base, duration: 650, ease: 'Elastic.easeOut' });
     this.cameras.main.flash(350, 255, 255, 255);
-    banner(this, eraData(result.era).name.toUpperCase() + '!', '#FFF04D');
+    this.setupCountdown(eraData(result.era).name.toUpperCase() + '!');
     popText(this, CASTLE_CENTER.x, CASTLE_CENTER.y - 70, `+${result.refund + result.bonus}`, '#FFF04D', 26);
     this.emitState();
   }
@@ -156,9 +158,11 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  // "Get ready" notice from Play until Wave 1 starts, so the player knows how long they have to prepare.
+  // Countdown notice until Wave 1 starts (after Play, and after each era upgrade with the new era's name),
+  // so the player knows how long they have to prepare.
   // It is plain text (not interactive), so taps still reach the castle and path cells under it.
-  setupCountdown() {
+  setupCountdown(heading = 'GET READY!') {
+    this.countdown?.box.destroy();
     const style = (size, color) => ({
       fontFamily: FONT,
       fontSize: `${size}px`,
@@ -167,9 +171,9 @@ export class GameScene extends Phaser.Scene {
       stroke: '#141F3D',
       strokeThickness: Math.round(size / 5),
     });
-    const title = this.add.text(0, 0, 'GET READY!', style(48, '#FFF04D')).setOrigin(0.5);
+    const title = this.add.text(0, 0, heading, style(48, '#FFF04D')).setOrigin(0.5);
     const timer = this.add.text(0, 48, '', style(26, '#FFFFFF')).setOrigin(0.5);
-    const box = this.add.container(640, 130, [title, timer]).setDepth(10001);
+    const box = this.add.container(640, 80, [title, timer]).setDepth(10001);
     this.countdown = { box, timer, shown: null };
     this.tickCountdown();
   }

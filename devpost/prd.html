@@ -180,10 +180,10 @@
     ["Game Screen","The player clicks the castle to earn money."],
     ["Shop","The player opens the Shop (middle-left button), buys this era's traps, and they go into the Inventory."],
     ["Placing traps","The player taps a path cell; a picker shows the era's 3 traps (owned → count, unowned → price, dimmed if unaffordable); tapping one places it, buying it on the spot if needed."],
-    ["Waves","Waves start automatically. Enemies walk the 4 paths. Stepping on a trap damages the enemy and uses 1 of the trap's uses."],
+    ["Waves","A \"GET READY!\" countdown shows the seconds until Wave 1; then waves start automatically. Enemies walk the 4 paths. Stepping on a trap damages the enemy and uses 1 of the trap's uses."],
     ["Drops","Killed enemies drop stone, wood, and gold, plus money — more for tougher enemies and later waves."],
     ["Castle hit","Enemies that reach the castle damage it and disappear."],
-    ["Upgrade","With enough resources, Upgrade (above the health bar) works any time: new era castle, scenery, Shop traps, health restored, next wave = Wave 1 of the new era. Old-era traps (map + Inventory) disappear and are refunded as money, plus a bonus worth 2 of the new era's cheapest trap."],
+    ["Upgrade","With enough resources, Upgrade (above the health bar) works any time: new era castle, scenery, Shop traps, health restored, next wave = Wave 1 of the new era. Old-era traps (map + Inventory) disappear and are refunded as money, plus a bonus worth 2 of the new era's cheapest trap. Old-era enemies on the map are cleared as kills (with drops). The new era's name counts down a 7 s break to its Wave 1."],
     ["Stuck era","Finish Wave 20 without upgrading → Wave 20 of that era repeats until the player upgrades."],
     ["Stats Screen","Win: survive Wave 20 of Era 5. Lose: castle health reaches 0. Both show time to finish, enemies killed, money remaining."]
   ];
@@ -224,7 +224,7 @@
     ["👹 Waves and Enemies","Waves auto-start; enemies come from all 4 directions. 3 enemy types per era, 20 waves per era. Waves ramp from few/slow/weak to many/fast/tanky. Kills drop stone/wood/gold plus money. Reaching the castle = damage, then vanish.",
       ["Enemies appear from all 4 edges and walk to the castle.","Kills increase stone/wood/gold.","An enemy at the castle lowers health and vanishes."]],
     ["⏩ Speed Button","Speeds up the game so a full run fits a demo.",["Pressing it visibly speeds up enemies, spawns, and waves; pressing again changes speed back."]],
-    ["⬆️ Castle Upgrade and Eras","Usable any time resources allow. Spends resources; new castle art; health restored; new scenery; Shop switches eras; next wave = Wave 1 of the new era. Old-era traps (map + Inventory) disappear and are refunded as money; bonus money = 2 of the new era's cheapest trap. Era 5 is the last.",
+    ["⬆️ Castle Upgrade and Eras","Usable any time resources allow. Spends resources; new castle art; health restored; new scenery; Shop switches eras; next wave = Wave 1 of the new era. Old-era traps (map + Inventory) disappear and are refunded as money; bonus money = 2 of the new era's cheapest trap. Old-era enemies on the map are cleared as kills with their drops; the new era's name and \"Enemies arrive in Ns\" count down a 7 s break. Era 5 is the last.",
       ["Upgrade changes castle, scenery, Shop, enemies, and refills health.","No old-era traps remain; money rises by refund + era bonus.","The era bonus alone buys 2 of the new era's cheapest trap.","Without enough resources the button is disabled and shows what's needed.","After Wave 20 without upgrading, Wave 20 repeats."]],
     ["📊 Stats Screen","Shown on win or loss: time to finish, enemies killed, money remaining. Market Royale results style.",
       ["Castle health 0 → Defeat stats with the three numbers.","Surviving Era 5 Wave 20 → Win stats with the three numbers."]]

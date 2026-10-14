@@ -12,7 +12,7 @@ Nothing to install, no account.
 2. **Tap a path cell** to place a trap. The picker shows the era's 3 traps: ones in your Inventory are placed for free, the rest are bought on the spot (dimmed when you can't afford them). Each trap deals triple damage to the enemy type it counters and has limited uses.
 3. You can also stock up in the **Shop** (left edge) to fill your Inventory ahead of time.
 4. Killed enemies drop **money, stone, wood, and gold**. Tougher enemies pay more.
-5. Press **Upgrade** (above the castle) to evolve into the next era: the castle, scenery, traps, and enemies all change. Old traps are refunded and you get a bonus.
+5. Press **Upgrade** (above the castle) to evolve into the next era: the castle, scenery, traps, and enemies all change. Old traps are refunded, old enemies are cleared (you keep their drops), you get a bonus, and a countdown gives you 7 seconds to prepare.
 6. Survive **Wave 20 of the Modern era** to win. If you don't upgrade after Wave 20, it repeats.
 
 Use the **speed button** (top left) to play at 1×, 2×, or 4×.
