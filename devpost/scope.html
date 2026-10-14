@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scope · Kingdoms & Dragons Tower Defense</title>
+<style>
+  :root {
+    --parch: #f3e6c4; --parch-dark: #e2cf9f; --ink: #3b2a1a; --ink-soft: #6b5338;
+    --wood: #8b5a2b; --wood-dark: #5e3a1a; --grass: #6a9a3a; --gold: #d9a521;
+    --stone: #8a8f96; --red: #b23a2a; --sky: #3f6e9e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; color: var(--ink); line-height: 1.55;
+    font-family: Georgia, "Times New Roman", serif;
+    background: radial-gradient(circle at 50% 0%, #4c6f2e 0%, #2f4a1d 70%) fixed;
+  }
+  .page {
+    max-width: 980px; margin: 32px auto; padding: 36px 44px 48px;
+    background: var(--parch); border: 6px solid var(--wood);
+    border-radius: 14px; box-shadow: 0 0 0 3px var(--wood-dark), 0 18px 40px rgba(0,0,0,.45);
+  }
+  h1 {
+    margin: 0 0 4px; font-size: 2.1rem; letter-spacing: .5px; color: var(--wood-dark);
+    text-shadow: 1px 1px 0 var(--parch-dark);
+  }
+  .tag { display:inline-block; font: 600 .75rem/1 system-ui, sans-serif; padding:5px 9px;
+         border-radius: 20px; background: var(--gold); color:#3b2a00; margin-right:6px; }
+  .tag.draft { background: var(--stone); color:#fff; }
+  .lead { font-size: 1.1rem; color: var(--ink-soft); margin: 14px 0 26px; }
+  h2 {
+    font-size: 1.3rem; color: var(--wood-dark); margin: 34px 0 12px;
+    border-bottom: 2px dashed var(--wood); padding-bottom: 4px;
+  }
+  .kernel { display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .card {
+    background: #fbf3dc; border: 2px solid var(--parch-dark); border-radius: 10px; padding: 14px 16px;
+  }
+  .card .icon { font-size: 1.7rem; }
+  .card b { display:block; margin: 4px 0; color: var(--wood-dark); }
+  .diagram { background:#fbf3dc; border:2px solid var(--parch-dark); border-radius:12px; padding: 10px; }
+  .diagram svg { width:100%; height:auto; display:block; }
+  .two { display:grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } .page { padding: 22px; } }
+  .eras { display:flex; gap:6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .eras button {
+    flex:1 1 140px; cursor:pointer; padding:10px 8px; border-radius:8px;
+    font: 600 .9rem system-ui, sans-serif; border:2px solid var(--wood); background:#fbf3dc; color:var(--ink);
+  }
+  .eras button[aria-pressed="true"] { background: var(--wood); color: #fff7e0; }
+  .era-panel { background:#fbf3dc; border:2px solid var(--parch-dark); border-radius:10px; padding:14px 18px; }
+  .era-panel h3 { margin: 0 0 6px; color: var(--wood-dark); }
+  .era-meta { display:flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  .pill { font: .85rem system-ui, sans-serif; background: var(--parch-dark); padding: 4px 10px; border-radius: 6px; }
+  .flow { display:flex; flex-wrap:wrap; align-items:center; gap:8px; font: .95rem system-ui, sans-serif; }
+  .flow span.step { background:#fbf3dc; border:2px solid var(--wood); border-radius:8px; padding:8px 12px; }
+  .flow span.arrow { color: var(--wood); font-weight:bold; }
+  details {
+    background:#fbf3dc; border:2px solid var(--parch-dark); border-radius:10px; margin: 10px 0; overflow:hidden;
+  }
+  summary {
+    cursor:pointer; padding: 12px 16px; font: 700 1rem system-ui, sans-serif; list-style:none;
+    display:flex; align-items:center; gap:10px;
+  }
+  summary::-webkit-details-marker { display:none; }
+  summary::after { content:"▸"; margin-left:auto; transition: transform .2s; }
+  details[open] summary::after { transform: rotate(90deg); }
+  details.now summary { background: #d9ead0; }
+  details.later summary { background: #f2e2b0; }
+  details.cut summary { background: #efc9c2; }
+  details ul { margin: 10px 22px 16px; }
+  .muted { color: var(--ink-soft); font-size: .9rem; }
+  a { color: var(--sky); }
+  .done {
+    background: var(--wood-dark); color: #fff7e0; border-radius: 12px; padding: 16px 20px;
+  }
+  .done .flow span.step { background: var(--wood); border-color: var(--gold); color:#fff7e0; }
+  .done .flow span.arrow { color: var(--gold); }
+  footer { margin-top: 30px; text-align:center; }
+  .swatches { display:flex; gap:6px; flex-wrap:wrap; }
+  .swatches span { width:30px; height:30px; border-radius:8px; border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,.2); }
+  .card.mr { background:#fff; border-color:#dcebf4; border-radius:30px; color:#141f3d;
+             font-family: "Fredoka", Inter, ui-rounded, "SF Pro Rounded", system-ui, sans-serif; }
+  .card.mr b { color:#141f3d; }
+  .mr-btn { display:inline-block; padding:10px 20px; border-radius:32px; font: 800 .85rem "Fredoka", ui-rounded, system-ui, sans-serif;
+            letter-spacing:.3px; box-shadow:0 5px 9px rgba(0,46,89,.14), inset 0 2px 1px rgba(255,255,255,.25); }
+  .mr-btn.green { background:#35ec00; color:#144509; }
+  .mr-btn.blue { background:#1268e8; color:#fff; }
+  .mr-btn.purple { background:#743ce5; color:#fff; }
+</style>
+</head>
+<body>
+<main class="page">
+  <span class="tag">status: approved</span><span class="tag">Scope</span>
+  <h1>🏰 Kingdoms &amp; Dragons Tower Defense</h1>
+  <p class="lead">A browser-based tower defense + clicker game: click the castle in the center of the map to earn money, place traps to stop enemies coming from 4 directions, and evolve the castle through 5 eras.</p>
+
+  <h2>⭐ The Unique Kernel</h2>
+  <div class="kernel">
+    <div class="card"><div class="icon">👆</div><b>Click the castle to earn money</b>The player keeps clicking for income while also managing the defense.</div>
+    <div class="card"><div class="icon">⏳</div><b>Castle and enemies evolve together</b>In a new era, the traps, enemies, buildings, and trees all change to match.</div>
+    <div class="card"><div class="icon">🧭</div><b>Attacks from 4 directions</b>North, South, East, and West at once, with the castle in the middle.</div>
+  </div>
+
+  <h2>🔁 Core Loop &amp; Map</h2>
+  <div class="two">
+    <div class="diagram" aria-label="Core loop diagram">
+      <svg viewBox="0 0 420 380" role="img">
+        <title>Core loop</title>
+        <defs>
+          <marker id="ar" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+            <path d="M0,0 L10,5 L0,10 z" fill="#8b5a2b"/>
+          </marker>
+        </defs>
+        <circle cx="210" cy="190" r="128" fill="none" stroke="#e2cf9f" stroke-width="22"/>
+        <g font-family="system-ui, sans-serif" font-size="13" text-anchor="middle" fill="#3b2a1a">
+          <!-- nodes -->
+          <g><rect x="140" y="28" width="140" height="44" rx="10" fill="#d9a521"/><text x="210" y="47" font-weight="700">👆 Click the castle</text><text x="210" y="63">→ 💰 Money</text></g>
+          <g><rect x="300" y="110" width="112" height="44" rx="10" fill="#fbf3dc" stroke="#8b5a2b" stroke-width="2"/><text x="356" y="129" font-weight="700">🪤 Buy traps</text><text x="356" y="145">place on paths</text></g>
+          <g><rect x="292" y="232" width="122" height="44" rx="10" fill="#fbf3dc" stroke="#b23a2a" stroke-width="2"/><text x="353" y="251" font-weight="700">⚔️ Enemies die</text><text x="353" y="267">drop resources</text></g>
+          <g><rect x="140" y="310" width="140" height="44" rx="10" fill="#fbf3dc" stroke="#8b5a2b" stroke-width="2"/><text x="210" y="329" font-weight="700">🪨 Stone · 🪵 Wood · 🪙 Gold</text><text x="210" y="345">collected</text></g>
+          <g><rect x="6" y="232" width="122" height="44" rx="10" fill="#fbf3dc" stroke="#8b5a2b" stroke-width="2"/><text x="67" y="251" font-weight="700">🏰 Upgrade castle</text><text x="67" y="267">spend resources</text></g>
+          <g><rect x="6" y="110" width="122" height="44" rx="10" fill="#5e3a1a"/><text x="67" y="129" font-weight="700" fill="#fff7e0">⏳ New era</text><text x="67" y="145" fill="#fff7e0">stronger traps + enemies</text></g>
+          <text x="210" y="186" font-size="15" font-weight="700" fill="#5e3a1a">Repeat</text>
+          <text x="210" y="205" fill="#6b5338">until the final wave</text>
+        </g>
+        <g stroke="#8b5a2b" stroke-width="2.5" fill="none" marker-end="url(#ar)">
+          <path d="M282,58 Q330,70 346,106"/>
+          <path d="M356,156 L354,228"/>
+          <path d="M318,278 Q300,310 284,322"/>
+          <path d="M138,322 Q110,305 88,280"/>
+          <path d="M67,230 L67,158"/>
+          <path d="M100,108 Q115,70 138,56"/>
+        </g>
+      </svg>
+    </div>
+    <div class="diagram" aria-label="Map diagram with 4 attack directions">
+      <svg viewBox="0 0 380 380" role="img">
+        <title>Map: castle in the center, attacks from 4 directions</title>
+        <rect width="380" height="380" rx="12" fill="#7fae4a"/>
+        <g fill="#c9a66b">
+          <rect x="170" y="0" width="40" height="160"/><rect x="170" y="220" width="40" height="160"/>
+          <rect x="0" y="170" width="160" height="40"/><rect x="220" y="170" width="160" height="40"/>
+        </g>
+        <g font-size="22">
+          <text x="40" y="70">🌳</text><text x="300" y="80">🌲</text><text x="60" y="320">🌲</text><text x="300" y="320">🌳</text>
+          <text x="110" y="130">🌳</text><text x="250" y="270">🌲</text>
+        </g>
+        <circle cx="190" cy="190" r="44" fill="#8a8f96" stroke="#5e3a1a" stroke-width="4"/>
+        <text x="190" y="202" font-size="34" text-anchor="middle">🏰</text>
+        <g font-size="18" text-anchor="middle">
+          <text x="190" y="40">👹</text><text x="190" y="360">👹</text>
+          <text x="28" y="196">👹</text><text x="352" y="196">👹</text>
+          <text x="190" y="110">🪤</text><text x="120" y="196">🪤</text>
+        </g>
+        <g font-family="system-ui, sans-serif" font-weight="700" font-size="14" fill="#fff7e0" text-anchor="middle"
+           style="paint-order:stroke" stroke="#3b2a1a" stroke-width="3">
+          <text x="235" y="22">North</text><text x="235" y="372">South</text>
+          <text x="40" y="160">West</text><text x="340" y="160">East</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <p class="muted">These diagrams show positions only; they are not screen designs. The detailed layout is decided in the PRD.</p>
+
+  <h2>⏳ 5 Eras</h2>
+  <div class="eras" role="group" aria-label="Choose an era">
+    <button data-era="0" aria-pressed="true">1 · Cave</button>
+    <button data-era="1" aria-pressed="false">2 · Wooden fort</button>
+    <button data-era="2" aria-pressed="false">3 · Stone castle</button>
+    <button data-era="3" aria-pressed="false">4 · Pre-modern</button>
+    <button data-era="4" aria-pressed="false">5 · Modern</button>
+  </div>
+  <div class="era-panel" id="eraPanel" aria-live="polite"></div>
+  <p class="muted">The specific enemies and traps for each era are decided in the PRD.</p>
+
+  <h2>🎯 What "Working" Looks Like</h2>
+  <div class="done">
+    <div class="flow">
+      <span class="step">Main menu</span><span class="arrow">→</span>
+      <span class="step">Click Play</span><span class="arrow">→</span>
+      <span class="step">Play through the waves</span><span class="arrow">→</span>
+      <span class="step">Game over 💀 / Survive the final wave 🏆</span><span class="arrow">→</span>
+      <span class="step">Stats screen</span>
+    </div>
+    <p style="margin:14px 0 0">✨ <b>The "oh, that's cool" moment:</b> the castle evolves into a new era, and the map, traps, and enemies all change with it.</p>
+  </div>
+
+  <h2>👥 Who It's For</h2>
+  <p>Anyone. Open a link in a browser and play right away, with <b>nothing to install and no account to make</b>.</p>
+
+  <h2>📦 Scope: Now · Later · Cut</h2>
+  <details class="now" open>
+    <summary>✅ Now (POC Boundary)</summary>
+    <ul>
+      <li>Main menu, the main game screen, and a stats screen for both win and loss.</li>
+      <li>One map with the castle in the center and 4 attack paths.</li>
+      <li>Click the castle to earn money. Buy traps and place them on the paths.</li>
+      <li>All 5 eras. Each era has 3 enemy types and 3 counter traps, priced from cheap to expensive.</li>
+      <li>Enemies drop stone, wood, and gold. Spend them to upgrade the castle to the next era.</li>
+      <li>Waves, enemies, and map visuals change with the era.</li>
+      <li>Playable from a link in a browser, with nothing to install and no account.</li>
+    </ul>
+  </details>
+  <details class="later">
+    <summary>⏸️ Later</summary>
+    <ul>
+      <li>Detailed hand-drawn art fully in the Kingdom Rush style. The POC uses simpler art in the same style and palette.</li>
+      <li>Upgrading individual traps within an era. In the POC, traps only upgrade with the castle's era.</li>
+      <li>Multiple maps and difficulty levels.</li>
+    </ul>
+  </details>
+  <details class="cut">
+    <summary>✂️ Explicitly Cut</summary>
+    <ul>
+      <li><b>Accounts and login:</b> players must be able to start playing immediately.</li>
+      <li><b>Requiring an install:</b> the game runs in the browser.</li>
+    </ul>
+  </details>
+
+  <h2>🎨 Inspiration &amp; Identity</h2>
+  <div class="two">
+    <div class="card">
+      <div class="icon">🗺️</div><b>Game world: Kingdom Rush / Age of War</b>
+      Map, castle, enemies, traps, buildings, trees. Kingdom Rush supplies the art style and palette; Age of War supplies the era theme:
+      <a href="https://armorgames.com/play/616/age-of-war">Armor Games</a> ·
+      <a href="https://ageofwargame.io/">ageofwargame.io</a> ·
+      <a href="https://aowg.fandom.com/wiki/Age_of_War">Wiki</a>
+      <div class="swatches" style="margin-top:10px">
+        <span style="background:#7fae4a"></span><span style="background:#c9a66b"></span><span style="background:#8b5a2b"></span><span style="background:#8a8f96"></span>
+      </div>
+      <p class="muted" style="margin:6px 0 0">Illustrative colors only. The real palette is decided in the spec.</p>
+    </div>
+    <div class="card mr">
+      <div class="icon">🎛️</div><b>Interface: Market Royale</b>
+      Menu, HUD, buttons, stats screen. <b>Fredoka</b> font, pill buttons, cards rounded 28–34px.
+      <div class="swatches" style="margin-top:10px">
+        <span title="#141F3D" style="background:#141F3D"></span><span title="#00A5FF→#1259E0" style="background:linear-gradient(145deg,#00A5FF,#1259E0)"></span>
+        <span title="#9A48F8→#5636D5" style="background:linear-gradient(145deg,#9A48F8,#5636D5)"></span><span title="#FF6B0A→#FF9E16" style="background:linear-gradient(145deg,#FF6B0A,#FF9E16)"></span>
+        <span title="#35EC00" style="background:#35EC00"></span><span title="#FFF04D" style="background:#FFF04D"></span><span title="#C7141F" style="background:#C7141F"></span>
+      </div>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
+        <span class="mr-btn green">PLAY</span><span class="mr-btn blue">UPGRADE</span><span class="mr-btn purple">STATS</span>
+      </div>
+    </div>
+  </div>
+
+  <h2>💡 Why This Matters to the Learner</h2>
+  <p>Learn how to make games with Phaser, learn how to work with an agent, and get the game running smoothly.</p>
+
+  <footer class="muted">The canonical document is <code>devpost/scope.md</code>. This page is a visual companion.</footer>
+</main>
+<script>
+  const eras = [
+    { name: "Prehistoric cave", icon: "🪨", castle: "Cave", note: "The starting era. Enemies and traps are from the stone age." },
+    { name: "Wooden fort (feudal)", icon: "🪵", castle: "Wooden fort", note: "Enemies are from the feudal era. Buildings and trees switch to the wooden era." },
+    { name: "Stone castle", icon: "🏰", castle: "Stone castle", note: "The castle and map move into the stone castle era." },
+    { name: "Pre-modern barracks", icon: "🎖️", castle: "Pre-modern barracks", note: "Enemies and traps are from the pre-modern era." },
+    { name: "Modern barracks", icon: "🪖", castle: "Modern barracks", note: "The final era. Survive the final wave to win." }
+  ];
+  const panel = document.getElementById("eraPanel");
+  const buttons = document.querySelectorAll(".eras button");
+  function show(i) {
+    const e = eras[i];
+    panel.innerHTML = `<h3>${e.icon} Era ${i + 1}: ${e.name}</h3><div>${e.note}</div>
+      <div class="era-meta"><span class="pill">🏰 ${e.castle}</span><span class="pill">👹 3 enemy types</span>
+      <span class="pill">🪤 3 counter traps (cheap → expensive)</span><span class="pill">🌳 Era buildings &amp; trees</span></div>`;
+    buttons.forEach((b, j) => b.setAttribute("aria-pressed", String(i === j)));
+  }
+  buttons.forEach(b => b.addEventListener("click", () => show(+b.dataset.era)));
+  show(0);
+</script>
+</body>
+</html>

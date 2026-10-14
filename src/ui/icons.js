@@ -1,0 +1,9 @@
+// Small inline SVG icons for the HUD (no emoji, so they look the same everywhere).
+const O = '#2b1d12';
+
+export const ICONS = {
+  money: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="#FFC21A" stroke="${O}" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="none" stroke="#E08A00" stroke-width="1.8"/><path d="M8 8.5a5 5 0 0 1 5-2" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".7"/></svg>`,
+  stone: `<svg viewBox="0 0 24 24"><path d="M4 16 6 8l6-4 7 3 2 8-5 5H8z" fill="#9AA0A6" stroke="${O}" stroke-width="2" stroke-linejoin="round"/><path d="M8 9l4-2.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".6"/></svg>`,
+  wood: `<svg viewBox="0 0 24 24"><rect x="3" y="7" width="15" height="10" rx="3" fill="#A86A32" stroke="${O}" stroke-width="2"/><ellipse cx="18" cy="12" rx="3.2" ry="5" fill="#E2B57A" stroke="${O}" stroke-width="2"/><ellipse cx="18" cy="12" rx="1.2" ry="2" fill="none" stroke="#A86A32" stroke-width="1.2"/></svg>`,
+  gold: `<svg viewBox="0 0 24 24"><path d="M3 18 6 9h12l3 9z" fill="#FFD23A" stroke="${O}" stroke-width="2" stroke-linejoin="round"/><path d="M8 11h7" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".7"/></svg>`,
+};

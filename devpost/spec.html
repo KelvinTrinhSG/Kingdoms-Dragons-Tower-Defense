@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spec · Kingdoms & Dragons Tower Defense</title>
+<style>
+  :root { --parch:#f3e6c4; --parch-dark:#e2cf9f; --ink:#3b2a1a; --ink-soft:#6b5338; --wood:#8b5a2b; --wood-dark:#5e3a1a;
+          --gold:#d9a521; --stone:#8a8f96; --sky:#3f6e9e; --navy:#141f3d; --purple:#743ce5; --green:#35ec00; }
+  * { box-sizing:border-box; }
+  body { margin:0; color:var(--ink); line-height:1.55; font-family:Georgia,"Times New Roman",serif;
+         background:radial-gradient(circle at 50% 0%,#4c6f2e 0%,#2f4a1d 70%) fixed; }
+  .page { max-width:1040px; margin:32px auto; padding:36px 44px 48px; background:var(--parch); border:6px solid var(--wood);
+          border-radius:14px; box-shadow:0 0 0 3px var(--wood-dark),0 18px 40px rgba(0,0,0,.45); }
+  h1 { margin:0 0 4px; font-size:2.1rem; color:var(--wood-dark); }
+  h2 { font-size:1.3rem; color:var(--wood-dark); margin:34px 0 12px; border-bottom:2px dashed var(--wood); padding-bottom:4px; }
+  .tag { display:inline-block; font:600 .75rem/1 system-ui,sans-serif; padding:5px 9px; border-radius:20px; background:var(--gold); color:#3b2a00; margin-right:6px; }
+  .tag.draft { background:var(--stone); color:#fff; }
+  .lead { font-size:1.1rem; color:var(--ink-soft); }
+  .box { background:#fbf3dc; border:2px solid var(--parch-dark); border-radius:12px; padding:14px 18px; }
+  svg { width:100%; height:auto; display:block; }
+  code { background:var(--parch-dark); padding:1px 5px; border-radius:4px; font-size:.85em; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { font:600 .85rem system-ui,sans-serif; background:#fff; border:2px solid var(--wood); border-radius:20px; padding:6px 12px; }
+  .chip small { color:var(--ink-soft); font-weight:400; }
+  .stepper { display:flex; gap:6px; flex-wrap:wrap; margin:12px 0; }
+  .stepper button { width:38px; height:38px; border-radius:50%; border:2px solid var(--wood); background:#fbf3dc; font:700 .95rem system-ui,sans-serif; cursor:pointer; }
+  .stepper button[aria-pressed="true"] { background:var(--wood); color:#fff7e0; }
+  .stepnav { display:flex; gap:8px; margin-top:10px; }
+  .stepnav button { cursor:pointer; padding:8px 16px; border-radius:20px; border:2px solid var(--wood); background:#fbf3dc; font:600 .85rem system-ui,sans-serif; }
+  #sTitle { font:700 .8rem system-ui,sans-serif; text-transform:uppercase; letter-spacing:.5px; color:var(--sky); }
+  #sText { font-size:1.05rem; margin:6px 0; }
+  #sFiles { font:.85rem system-ui,sans-serif; color:var(--ink-soft); }
+  .lane { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:10px; font:.8rem system-ui,sans-serif; text-align:center; }
+  .lane div { border-radius:10px; padding:8px; border:2px solid transparent; opacity:.45; transition:all .2s; }
+  .lane .ui { background:#efe6ff; } .lane .busx { background:#fff5d3; } .lane .world { background:#d9ead0; }
+  .lane div.on { opacity:1; border-color:var(--wood-dark); transform:scale(1.03); }
+  details { background:#fbf3dc; border:2px solid var(--parch-dark); border-radius:10px; margin:8px 0; overflow:hidden; }
+  summary { cursor:pointer; padding:11px 16px; font:700 .98rem system-ui,sans-serif; list-style:none; display:flex; gap:10px; align-items:center; }
+  summary::-webkit-details-marker { display:none; }
+  summary::after { content:"▸"; margin-left:auto; transition:transform .2s; }
+  details[open] summary::after { transform:rotate(90deg); }
+  details > div { padding:2px 18px 14px; }
+  .ref { font:.8rem system-ui,sans-serif; color:var(--sky); }
+  .grp { font:700 .75rem system-ui,sans-serif; text-transform:uppercase; padding:2px 8px; border-radius:8px; margin-left:4px; }
+  .g-world { background:#d9ead0; } .g-ui { background:#efe6ff; } .g-logic { background:#fff5d3; } .g-ops { background:#dbe7f5; }
+  pre { background:#2b1d12; color:#f3e6c4; border-radius:10px; padding:14px 16px; overflow:auto; font-size:.82rem; line-height:1.45; }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:760px){ .two{grid-template-columns:1fr;} .page{padding:22px;} .lane{grid-template-columns:1fr;} }
+  .fail { border-left:5px solid #b23a2a; margin-bottom:8px; }
+  .muted { color:var(--ink-soft); font-size:.9rem; }
+  footer { margin-top:30px; text-align:center; }
+</style>
+</head>
+<body>
+<main class="page">
+  <span class="tag">status: approved</span><span class="tag">Technical Spec</span>
+  <h1>🏰 Kingdoms &amp; Dragons — Technical Spec</h1>
+  <p class="lead">One web page, two stacked layers: a <b>Phaser 4 world</b> drawn entirely with code, and a <b>Market Royale–style HTML/CSS interface</b> on top. They talk through a small <b>event bus</b>. Vite builds it; GitHub Actions publishes it to GitHub Pages.</p>
+
+  <h2>🧱 Stack</h2>
+  <div class="chips">
+    <span class="chip">Phaser <small>4.2.1</small></span><span class="chip">Vite <small>8.3.4</small></span>
+    <span class="chip">JavaScript <small>ES modules</small></span><span class="chip">@fontsource/fredoka <small>5.3.0</small></span>
+    <span class="chip">Vitest <small>dev only</small></span><span class="chip">GitHub Pages + Actions</span><span class="chip">Node <small>24.15.0</small></span>
+  </div>
+
+  <h2>🗺️ Architecture</h2>
+  <div class="box">
+    <svg viewBox="0 0 960 400" role="img" aria-label="Architecture diagram">
+      <title>Architecture: interface layer, event bus, world layer, logic, data</title>
+      <defs><marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5e3a1a"/></marker></defs>
+      <g font-family="system-ui,sans-serif">
+        <rect x="20" y="20" width="920" height="96" rx="26" fill="#fff" stroke="#743ce5" stroke-width="3"/>
+        <text x="40" y="46" font-weight="700" font-size="15" fill="#141f3d">INTERFACE LAYER · HTML/CSS (src/ui/) · Market Royale style · Fredoka</text>
+        <g font-size="13" fill="#141f3d" text-anchor="middle">
+          <rect x="40" y="60" width="120" height="40" rx="20" fill="#efe6ff"/><text x="100" y="85">Main Menu</text>
+          <rect x="172" y="60" width="100" height="40" rx="20" fill="#efe6ff"/><text x="222" y="85">HUD</text>
+          <rect x="284" y="60" width="150" height="40" rx="20" fill="#efe6ff"/><text x="359" y="85">Shop + Inventory</text>
+          <rect x="446" y="60" width="120" height="40" rx="20" fill="#efe6ff"/><text x="506" y="85">Trap picker</text>
+          <rect x="578" y="60" width="160" height="40" rx="20" fill="#35ec00"/><text x="658" y="85" fill="#144509" font-weight="700">Upgrade button</text>
+          <rect x="750" y="60" width="170" height="40" rx="20" fill="#efe6ff"/><text x="835" y="85">Stats Screen</text>
+        </g>
+        <rect x="300" y="150" width="360" height="54" rx="27" fill="#fff5d3" stroke="#d9a521" stroke-width="3"/>
+        <text x="480" y="174" text-anchor="middle" font-weight="700" font-size="15">📣 EVENT BUS (src/bus.js)</text>
+        <text x="480" y="193" text-anchor="middle" font-size="11" fill="#6b5338">state:changed · cell:tapped · game:over ⇅ ui:buyTrap · ui:placeTrap · ui:upgrade · ui:speed</text>
+        <rect x="20" y="236" width="600" height="146" rx="16" fill="#7fae4a" stroke="#5e3a1a" stroke-width="3"/>
+        <text x="40" y="262" font-weight="700" font-size="15" fill="#fff7e0">WORLD LAYER · Phaser 4 canvas (1280×800, Scale.FIT)</text>
+        <g font-size="12.5" fill="#3b2a1a" text-anchor="middle">
+          <rect x="40" y="276" width="120" height="40" rx="8" fill="#e8f5d0"/><text x="100" y="300">BootScene</text>
+          <rect x="172" y="276" width="120" height="40" rx="8" fill="#e8f5d0"/><text x="232" y="300">MenuScene</text>
+          <rect x="304" y="276" width="296" height="40" rx="8" fill="#fff7e0"/><text x="452" y="300" font-weight="700">GameScene (update loop, speed ×1/2/4)</text>
+          <rect x="40" y="326" width="170" height="40" rx="8" fill="#e8f5d0"/><text x="125" y="350">art/ (code-drawn textures)</text>
+          <rect x="222" y="326" width="120" height="40" rx="8" fill="#e8f5d0"/><text x="282" y="350">grid.js · 32×20</text>
+          <rect x="354" y="326" width="110" height="40" rx="8" fill="#e8f5d0"/><text x="409" y="350">Enemy.js</text>
+          <rect x="476" y="326" width="124" height="40" rx="8" fill="#e8f5d0"/><text x="538" y="350">Trap.js</text>
+        </g>
+        <rect x="650" y="236" width="290" height="80" rx="16" fill="#fff5d3" stroke="#d9a521" stroke-width="2"/>
+        <text x="670" y="260" font-weight="700" font-size="14">LOGIC (pure, tested)</text>
+        <text x="670" y="282" font-size="12">state · economy · combat · waves</text>
+        <text x="670" y="302" font-size="11" fill="#6b5338">tests/ with Vitest</text>
+        <rect x="650" y="326" width="290" height="56" rx="16" fill="#dbe7f5" stroke="#3f6e9e" stroke-width="2"/>
+        <text x="670" y="350" font-weight="700" font-size="14">DATA</text>
+        <text x="670" y="370" font-size="12">eras.js (5 eras) · balance.js (numbers)</text>
+      </g>
+      <g stroke="#5e3a1a" stroke-width="2.5" fill="none" marker-end="url(#m)">
+        <path d="M480,118 L480,146"/><path d="M470,206 L470,232"/><path d="M490,232 L490,208"/>
+        <path d="M600,296 L646,280"/><path d="M795,318 L795,324"/>
+      </g>
+    </svg>
+  </div>
+
+  <h2>🧭 Core Journey Through the System</h2>
+  <p class="muted">Step through the PRD journey and watch which layer handles each step.</p>
+  <div class="stepper" id="stepper"></div>
+  <div class="box">
+    <div id="sTitle"></div><div id="sText" aria-live="polite"></div><div id="sFiles"></div>
+    <div class="lane"><div class="ui" id="lUi">🎛️ Interface</div><div class="busx" id="lBus">📣 Event bus</div><div class="world" id="lWorld">🗺️ World + logic</div></div>
+    <div class="stepnav"><button id="prev">← Back</button><button id="next">Next →</button></div>
+  </div>
+
+  <h2>🧩 Components</h2>
+  <p class="muted">Tap a component to see what it does, its files, and the PRD behavior it implements.</p>
+  <div id="comps"></div>
+
+  <h2>💾 Data Model</h2>
+  <div class="two">
+    <pre>state = {
+  era: 1, wave: 1, waveRepeating: false,
+  money, stone, wood, gold,
+  castleHp, castleMaxHp,
+  inventory: { trapId: count },
+  traps: [{ id, trapId, col, row, usesLeft }],
+  kills, startedAt, speed: 1 | 2 | 4,
+  over, won
+}</pre>
+    <div class="box">
+      <b>Where it lives:</b> in memory, in the browser tab, for one run.<br>
+      <b>Who changes it:</b> only the logic modules, called from GameScene → then <code>state:changed</code>.<br>
+      <b>Who reads it:</b> the interface, from the <code>state:changed</code> snapshot.<br>
+      <b>Leave and come back:</b> nothing is saved; reloading starts over.<br>
+      <b>Time to finish:</b> real clock time from Play to game over.
+    </div>
+  </div>
+
+  <h2>🌍 Where It Runs</h2>
+  <div class="two">
+    <pre>npm install
+npm run dev      # http://localhost:5173
+npm test         # rule tests (Vitest)
+npm run build    # → dist/
+npm run preview  # check production build
+
+# testing shortcut:
+?era=3&wave=18&money=5000&res=999</pre>
+    <div class="box">
+      <b>Public link:</b><br><code>https://kelvintrinhsg.github.io/Kingdoms-Dragons-Tower-Defense/</code><br><br>
+      Push to <code>main</code> → GitHub Actions: install → test → build → deploy.<br>
+      One-time: Settings → Pages → Source: <b>GitHub Actions</b>; repo <b>public</b>.<br>
+      <code>vite.config.js</code>: <code>base: '/Kingdoms-Dragons-Tower-Defense/'</code>
+    </div>
+  </div>
+
+  <h2>🎨 Era Palettes (world layer)</h2>
+  <div class="box" id="pal"></div>
+
+  <h2>📁 File Structure</h2>
+  <pre>Kingdoms-Dragons-Tower-Defense/
+├── index.html                 # #game canvas container + #ui overlay
+├── package.json · vite.config.js
+├── .github/workflows/deploy.yml
+├── src/
+│   ├── main.js · bus.js
+│   ├── data/      eras.js · balance.js
+│   ├── logic/     state.js · economy.js · combat.js · waves.js   (pure, tested)
+│   ├── world/     grid.js · Enemy.js · Trap.js
+│   ├── art/       palette.js · castle.js · enemy.js · trap.js · scenery.js · fx.js
+│   ├── scenes/    BootScene.js · MenuScene.js · GameScene.js
+│   └── ui/        styles.css · menu.js · hud.js · shop.js · picker.js · upgrade.js · stats.js
+├── tests/         economy.test.js · combat.test.js · waves.test.js
+├── devpost/       # Devpost learning workspace
+└── README.md</pre>
+
+  <h2>⚠️ Failure Modes &amp; Fallbacks</h2>
+  <div class="box fail"><b>Blank page on Pages</b> → <code>base</code> path set; check with <code>npm run preview</code> and the live URL.</div>
+  <div class="box fail"><b>Slowdown at 4×</b> → pre-generated textures, cap ~60 live enemies, remove dead sprites immediately.</div>
+  <div class="box fail"><b>Interface misaligned with canvas</b> → recompute world→screen positions on resize and <code>castle:moved</code>.</div>
+  <div class="box fail"><b>Balance unwinnable/trivial</b> → numbers in one place, dev shortcuts, rule tests.</div>
+
+  <h2>✂️ Simplified · ✅ Decisions · ❓ Open</h2>
+  <details><summary>✂️ What was simplified</summary><div><ul>
+    <li><b>Code-drawn art</b> instead of sprites (learner's choice). Swappable later without touching logic.</li>
+    <li><b>Straight paths</b> instead of winding roads. Winding = new waypoint lists only.</li>
+    <li><b>Waypoint movement</b> instead of physics.</li>
+    <li><b>No sound</b> (later enhancement).</li>
+    <li><b>Dev shortcuts</b>: testing aid, not a player feature.</li>
+  </ul></div></details>
+  <details open><summary>✅ Learner decisions</summary><div><ul>
+    <li>Phaser 4 + Vite + JavaScript: learn Phaser on the current version.</li>
+    <li>GitHub Pages: free, in the existing repo; repo must be public.</li>
+    <li>Art drawn with code: fastest path to all 5 eras; not hand-painted quality.</li>
+    <li>HTML/CSS interface over the canvas: Market Royale styling; needs an event bus.</li>
+    <li>Learner uncertainty: none identified; learner will read the docs after the build (code tour will point to the key Phaser concepts).</li>
+  </ul></div></details>
+  <details><summary>❓ Open issues (tuned during build)</summary><div><ul>
+    <li>Wave length (~20–30 s at 1×), speed levels 1×/2×/4×.</li>
+    <li>Balance numbers: click money, prices, uses 1/3/5, damage, health, speed, drops, upgrade costs.</li>
+    <li>Verify early: Phaser 4.2.1 <code>generateTexture</code>, time scales, input; current GitHub Pages action versions.</li>
+  </ul></div></details>
+
+  <footer class="muted">The canonical document is <code>devpost/spec.md</code>. This page is a visual companion.</footer>
+</main>
+<script>
+  const S = [
+    ["Open the link","GitHub Pages serves index.html → Phaser starts → BootScene draws every texture with code → MenuScene shows Era 1 scenery → the interface shows the Main Menu.","index.html · main.js · BootScene · MenuScene · ui/menu.js",["ui","world"]],
+    ["Click Play","Menu emits ui:play → GameScene starts with a fresh state (Era 1, Wave 1) → HUD appears.","ui/menu.js · bus.js · logic/state.js · GameScene",["ui","bus","world"]],
+    ["Click the castle","GameScene → economy.clickCastle → state:changed → HUD money updates; +money pop-up.","GameScene · logic/economy.js · ui/hud.js",["world","bus","ui"]],
+    ["Buy a trap","Shop emits ui:buyTrap → economy.buyTrap checks money → Inventory +1 → state:changed.","ui/shop.js · logic/economy.js",["ui","bus","world"]],
+    ["Place a trap","Tap → grid.cellAt → cell:tapped → picker opens → ui:placeTrap → Trap sprite placed, Inventory −1.","world/grid.js · ui/picker.js · world/Trap.js",["world","bus","ui"]],
+    ["Waves","waves.buildWave → spawns at 4 edges → Enemy walks its lane → enters trap cell → combat.hitTrap (×3 vs counter), uses −1.","logic/waves.js · world/Enemy.js · logic/combat.js",["world"]],
+    ["Enemy dies","Drop added to stone/wood/gold, kills +1 → state:changed → HUD.","logic/economy.js · ui/hud.js",["world","bus","ui"]],
+    ["Enemy reaches castle","combat.castleHit → health bar drops, enemy removed.","logic/combat.js · GameScene",["world"]],
+    ["Upgrade","ui:upgrade → economy.applyUpgrade: spend, refund old traps, era bonus, refill health, era+1 → castle & scenery redrawn, Shop switches, next wave = Wave 1.","ui/upgrade.js · logic/economy.js · art/ · GameScene",["ui","bus","world"]],
+    ["Wave 20 repeat","No upgrade after Wave 20 → wave manager repeats Wave 20.","logic/waves.js · GameScene",["world"]],
+    ["Game over","Health 0 or Era 5 Wave 20 cleared → game:over → Stats Screen (time, kills, money) with Play Again / Main Menu.","GameScene · ui/stats.js",["world","bus","ui"]]
+  ];
+  let c=0; const st=document.getElementById("stepper");
+  S.forEach((s,i)=>{const b=document.createElement("button");b.textContent=i+1;b.onclick=()=>go(i);st.appendChild(b);});
+  function go(i){c=Math.max(0,Math.min(S.length-1,i));const s=S[c];
+    sTitle.textContent="Step "+(c+1)+" · "+s[0]; sText.textContent=s[1]; sFiles.textContent="Files: "+s[2];
+    lUi.classList.toggle("on",s[3].includes("ui")); lBus.classList.toggle("on",s[3].includes("bus")); lWorld.classList.toggle("on",s[3].includes("world"));
+    [...st.children].forEach((b,j)=>b.setAttribute("aria-pressed",String(j===c)));}
+  prev.onclick=()=>go(c-1); next.onclick=()=>go(c+1); go(0);
+
+  const C = [
+    ["Bootstrap and Layout","ops","#game canvas container + #ui overlay; Phaser Scale.FIT at 1280×800; reads dev shortcuts.","index.html · src/main.js","Screens and Layout"],
+    ["Event Bus","logic","Shared Phaser EventEmitter. Game→UI: state:changed, cell:tapped, cell:info, castle:moved, game:over. UI→Game: ui:play, ui:buyTrap, ui:placeTrap, ui:upgrade, ui:speed, ui:menu, ui:restart.","src/bus.js","all Features and Behavior"],
+    ["Game State","logic","Creates and holds the run's state; only logic modules change it.","src/logic/state.js","States and Boundaries"],
+    ["Economy Rules","logic","clickCastle, buyTrap, placeTrap, addDrop, canUpgrade, refundTraps (price × usesLeft ÷ uses), eraBonus (2 × cheapest), applyUpgrade.","src/logic/economy.js · tests/economy.test.js","Clicking the Castle · Shop and Inventory · Castle Upgrade and Eras"],
+    ["Combat Rules","logic","trapDamage (×3 vs countered type), hitTrap (uses −1), castleHit.","src/logic/combat.js · tests/combat.test.js","Traps in Action · Waves and Enemies"],
+    ["Wave Manager","logic","buildWave(era, n): growing counts, heavier later, all 4 directions. Break ~3 s between waves; Wave 20 repeats; Era 5 Wave 20 cleared = win.","src/logic/waves.js · tests/waves.test.js","Waves and Enemies · Castle Upgrade and Eras"],
+    ["Grid and Paths","world","32×20 grid of 40px; castle at center (cols 14–17, rows 8–11); 4 straight 2-cell-wide paths; lane waypoints.","src/world/grid.js","Placing Traps · Screens and Layout"],
+    ["Procedural Art","world","Graphics drawn once and saved with generateTexture: castles, enemy template + era accessories, traps, scenery, fx.","src/art/*.js","Look and Feel · Castle Upgrade and Eras"],
+    ["Scenes","world","BootScene (textures) → MenuScene (Era 1 backdrop) → GameScene (world, update loop, speed, input, era redraw, game over).","src/scenes/*.js","The Core Journey · Speed Button"],
+    ["Enemies","world","Sprite with type, health, speed, waypoints, triggered-trap set; moves each frame; reports cell entry and castle arrival.","src/world/Enemy.js","Waves and Enemies · Traps in Action"],
+    ["Traps","world","Sprite on a path cell with uses badge; removed at 0 uses or on upgrade.","src/world/Trap.js","Traps in Action · Placing Traps"],
+    ["Interface Screens","ui","menu, hud (wave + speed top-left, resources top-right, Shop middle-left), shop + inventory, picker, upgrade (follows castle), stats.","src/ui/*.js · styles.css","Screens and Layout · Shop and Inventory · Placing Traps · Stats Screen"],
+    ["Game Data","logic","eras.js: 5 eras × 3 enemies × 3 traps, castle health, upgrade costs. balance.js: every tunable number.","src/data/eras.js · balance.js","Era Roster · Open Questions"],
+    ["Deployment","ops","base path for Pages; workflow: install → test → build → deploy on push to main.","vite.config.js · .github/workflows/deploy.yml","Who It's For (scope)"]
+  ];
+  const G={world:["g-world","World"],ui:["g-ui","Interface"],logic:["g-logic","Logic"],ops:["g-ops","Ops"]};
+  comps.innerHTML=C.map(([n,g,d,f,r])=>`<details><summary>${n}<span class="grp ${G[g][0]}">${G[g][1]}</span></summary><div><p>${d}</p><p><code>${f}</code></p><p class="ref">Implements prd.md › ${r}</p></div></details>`).join("");
+
+  const P=[["1 · Cave","#9bb35a","#b98b55","#8a7f73"],["2 · Wooden Fort","#7fae4a","#c9a66b","#8b5a2b"],["3 · Stone Castle","#6f9e45","#b9ad97","#8a8f96"],["4 · Pre-modern","#8a9a52","#a89a7a","#9c4a33"],["5 · Modern","#5d7d44","#5f6166","#4b5563"]];
+  pal.innerHTML=P.map(p=>`<div style="display:flex;align-items:center;gap:10px;margin:6px 0;font:600 .9rem system-ui,sans-serif">
+    <span style="width:140px">${p[0]}</span>${p.slice(1).map((h,i)=>`<span title="${["ground","path","accent"][i]} ${h}" style="width:70px;height:28px;border-radius:8px;background:${h};border:2px solid #2b1d12"></span>`).join("")}</div>`).join("")+
+    `<p class="muted" style="margin:6px 0 0">ground · path · accent. Outline #2b1d12 everywhere.</p>`;
+</script>
+</body>
+</html>

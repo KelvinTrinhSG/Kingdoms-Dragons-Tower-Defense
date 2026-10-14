@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRD · Kingdoms & Dragons Tower Defense</title>
+<style>
+  :root {
+    --parch:#f3e6c4; --parch-dark:#e2cf9f; --ink:#3b2a1a; --ink-soft:#6b5338; --wood:#8b5a2b; --wood-dark:#5e3a1a;
+    --gold:#d9a521; --stone:#8a8f96; --red:#b23a2a; --sky:#3f6e9e;
+    --mr-navy:#141f3d; --mr-green:#35ec00; --mr-purple:#743ce5;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; color:var(--ink); line-height:1.55; font-family:Georgia,"Times New Roman",serif;
+         background:radial-gradient(circle at 50% 0%,#4c6f2e 0%,#2f4a1d 70%) fixed; }
+  .page { max-width:1000px; margin:32px auto; padding:36px 44px 48px; background:var(--parch);
+          border:6px solid var(--wood); border-radius:14px; box-shadow:0 0 0 3px var(--wood-dark),0 18px 40px rgba(0,0,0,.45); }
+  h1 { margin:0 0 4px; font-size:2.1rem; color:var(--wood-dark); }
+  h2 { font-size:1.3rem; color:var(--wood-dark); margin:34px 0 12px; border-bottom:2px dashed var(--wood); padding-bottom:4px; }
+  h3 { margin:0 0 6px; color:var(--wood-dark); }
+  .tag { display:inline-block; font:600 .75rem/1 system-ui,sans-serif; padding:5px 9px; border-radius:20px; background:var(--gold); color:#3b2a00; margin-right:6px; }
+  .tag.draft { background:var(--stone); color:#fff; }
+  .lead { font-size:1.1rem; color:var(--ink-soft); margin:14px 0 8px; }
+  .src { font:.8rem system-ui,sans-serif; color:var(--ink-soft); }
+  .src code, code { background:var(--parch-dark); padding:1px 5px; border-radius:4px; font-size:.85em; }
+  .box { background:#fbf3dc; border:2px solid var(--parch-dark); border-radius:12px; padding:14px 18px; }
+  svg { width:100%; height:auto; display:block; }
+  /* journey stepper */
+  .stepper { display:flex; gap:6px; flex-wrap:wrap; margin:12px 0; }
+  .stepper button { width:38px; height:38px; border-radius:50%; border:2px solid var(--wood); background:#fbf3dc;
+                    font:700 .95rem system-ui,sans-serif; color:var(--ink); cursor:pointer; }
+  .stepper button[aria-pressed="true"] { background:var(--wood); color:#fff7e0; }
+  .stepnav { display:flex; gap:8px; margin-top:10px; }
+  .stepnav button { cursor:pointer; padding:8px 16px; border-radius:20px; border:2px solid var(--wood); background:#fbf3dc;
+                    font:600 .85rem system-ui,sans-serif; }
+  #stepText { font-size:1.05rem; min-height:3.2em; }
+  #stepScreen { font:700 .75rem system-ui,sans-serif; text-transform:uppercase; letter-spacing:.5px; color:var(--sky); }
+  /* game screen mock */
+  .mock { position:relative; aspect-ratio:16/10; border-radius:14px; overflow:hidden; border:3px solid var(--wood-dark);
+          background:#7fae4a; font-family:"Fredoka",ui-rounded,system-ui,sans-serif; }
+  .mock .hud { position:absolute; background:rgba(255,255,255,.92); color:var(--mr-navy); border-radius:18px; padding:6px 12px;
+               font-size:.8rem; font-weight:700; box-shadow:0 4px 10px rgba(0,46,89,.2); cursor:pointer; border:2px solid transparent; }
+  .mock .hud:hover, .mock .hud.active { border-color:var(--mr-purple); }
+  .mock .path { position:absolute; background:#c9a66b; }
+  .mock .castle { position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); font-size:2.6rem; cursor:pointer; }
+  .hotinfo { margin-top:10px; min-height:2.6em; }
+  /* reveals */
+  details { background:#fbf3dc; border:2px solid var(--parch-dark); border-radius:10px; margin:10px 0; overflow:hidden; }
+  summary { cursor:pointer; padding:12px 16px; font:700 1rem system-ui,sans-serif; list-style:none; display:flex; gap:10px; align-items:center; }
+  summary::-webkit-details-marker { display:none; }
+  summary::after { content:"▸"; margin-left:auto; transition:transform .2s; }
+  details[open] summary::after { transform:rotate(90deg); }
+  details > div { padding:4px 18px 14px; }
+  .crit { list-style:none; padding-left:0; }
+  .crit li::before { content:"☐ "; color:var(--wood); font-weight:bold; }
+  details.now summary { background:#d9ead0; } details.later summary { background:#f2e2b0; } details.cut summary { background:#efc9c2; }
+  /* roster */
+  .eras { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .eras button { flex:1 1 130px; cursor:pointer; padding:9px 6px; border-radius:8px; font:600 .85rem system-ui,sans-serif;
+                 border:2px solid var(--wood); background:#fbf3dc; color:var(--ink); }
+  .eras button[aria-pressed="true"] { background:var(--wood); color:#fff7e0; }
+  table { width:100%; border-collapse:collapse; font:.95rem system-ui,sans-serif; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--parch-dark); }
+  th { color:var(--ink-soft); font-size:.8rem; text-transform:uppercase; }
+  .assume { display:inline-block; font:700 .7rem system-ui,sans-serif; background:#f2e2b0; color:#7a5200; padding:3px 8px; border-radius:10px; }
+  .oq { border-left:5px solid var(--red); }
+  .oq.tune { border-left-color:var(--gold); }
+  .two { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:760px){ .two{grid-template-columns:1fr;} .page{padding:22px;} }
+  .muted { color:var(--ink-soft); font-size:.9rem; }
+  footer { margin-top:30px; text-align:center; }
+</style>
+</head>
+<body>
+<main class="page">
+  <span class="tag">status: approved</span><span class="tag">PRD</span>
+  <h1>🏰 Kingdoms &amp; Dragons — Product Requirements</h1>
+  <p class="lead">Click the central castle for money, stock traps from a shop, place them on a grid along 4 enemy paths, and evolve the castle through 5 eras until you survive the final wave.</p>
+  <p class="muted">Scope said <i>"click the castle, buy traps, upgrade through eras."</i> Now we know exactly what each of those means on screen.</p>
+
+  <h2>🧭 The Core Journey</h2>
+  <div class="box">
+    <svg viewBox="0 0 900 150" role="img" aria-label="Screen flow">
+      <title>Screen flow</title>
+      <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8b5a2b"/></marker></defs>
+      <g font-family="system-ui,sans-serif" text-anchor="middle">
+        <rect x="10" y="40" width="170" height="70" rx="30" fill="#fff" stroke="#743ce5" stroke-width="3"/>
+        <text x="95" y="72" font-weight="700" font-size="16" fill="#141f3d">Main Menu</text>
+        <text x="95" y="92" font-size="12" fill="#406394">Play · How to Play</text>
+        <rect x="260" y="20" width="300" height="110" rx="16" fill="#7fae4a" stroke="#5e3a1a" stroke-width="3"/>
+        <text x="410" y="55" font-weight="700" font-size="16" fill="#fff7e0">Game Screen</text>
+        <text x="410" y="78" font-size="12" fill="#fff7e0">click castle · shop · place traps</text>
+        <text x="410" y="96" font-size="12" fill="#fff7e0">waves · upgrade era (×5)</text>
+        <text x="410" y="116" font-size="11" fill="#e8f5d0">20 waves / era · Wave 20 repeats until upgrade</text>
+        <rect x="660" y="5" width="220" height="60" rx="30" fill="#35ec00"/>
+        <text x="770" y="32" font-weight="700" font-size="15" fill="#144509">🏆 Win Stats</text>
+        <text x="770" y="50" font-size="11" fill="#144509">survived Era 5 · Wave 20</text>
+        <rect x="660" y="85" width="220" height="60" rx="30" fill="#c7141f"/>
+        <text x="770" y="112" font-weight="700" font-size="15" fill="#fff">💀 Defeat Stats</text>
+        <text x="770" y="130" font-size="11" fill="#ffe0e4">castle health = 0</text>
+      </g>
+      <g stroke="#8b5a2b" stroke-width="3" fill="none" marker-end="url(#a)">
+        <path d="M182,75 L255,75"/><path d="M562,60 L655,38"/><path d="M562,95 L655,115"/>
+      </g>
+    </svg>
+  </div>
+  <div class="stepper" id="stepper" role="group" aria-label="Journey steps"></div>
+  <div class="box">
+    <div id="stepScreen"></div>
+    <div id="stepText" aria-live="polite"></div>
+    <div class="stepnav"><button id="prev">← Back</button><button id="next">Next →</button></div>
+  </div>
+  <p class="src">Source: <code>scope.md &gt; What "Working" Looks Like</code></p>
+
+  <h2>🖥️ Game Screen Layout</h2>
+  <p class="muted">Tap any HUD element or the castle to see what it does. This is a layout sketch, not final art.</p>
+  <div class="mock" id="mock">
+    <div class="path" style="left:46%;top:0;width:8%;height:42%"></div>
+    <div class="path" style="left:46%;bottom:0;width:8%;height:38%"></div>
+    <div class="path" style="left:0;top:47%;width:42%;height:10%"></div>
+    <div class="path" style="right:0;top:47%;width:42%;height:10%"></div>
+    <div class="hud" data-k="wave" style="left:12px;top:12px">STONE AGE · WAVE 7/20 &nbsp;⏩ 2×</div>
+    <div class="hud" data-k="res" style="right:12px;top:12px">💰 120 · 🪨 30 · 🪵 18 · 🪙 6</div>
+    <div class="hud" data-k="shop" style="left:12px;top:46%">🛒 SHOP</div>
+    <div class="hud" data-k="up" style="left:50%;top:22%;transform:translateX(-50%);background:#35ec00;color:#144509">⬆ UPGRADE</div>
+    <div class="hud" data-k="hp" style="left:50%;top:33%;transform:translateX(-50%);padding:4px 10px">❤ ▓▓▓▓▓▓░░</div>
+    <div class="castle" data-k="castle" role="button" tabindex="0">🛖</div>
+    <div class="hud" data-k="cell" style="left:47%;top:8%;padding:3px 6px">🪤</div>
+  </div>
+  <div class="box hotinfo" id="hotinfo" aria-live="polite">Tap an element above.</div>
+
+  <h2>⚙️ Features and Behavior</h2>
+  <div id="features"></div>
+
+  <h2>⏳ Era Roster</h2>
+  <p class="muted">Pattern: fast · standard · heavy enemies. Cheap trap counters the fast enemy, mid trap the standard enemy, expensive trap the heavy enemy. Counter traps hit everyone, but hit their target harder.</p>
+  <div class="eras" id="eraBtns" role="group" aria-label="Choose era"></div>
+  <div class="box"><table><thead><tr><th>Role</th><th>Enemy</th><th>Counter trap</th><th>Uses</th></tr></thead><tbody id="roster"></tbody></table></div>
+
+  <h2>🚦 States and Boundaries</h2>
+  <div class="two">
+    <div class="box"><b>First play</b><br>Era 1, Wave 1, empty Inventory, some starting money <span class="assume">ASSUMPTION</span>, full castle health.</div>
+    <div class="box"><b>Empty Inventory</b><br>Tapping a path cell shows a message pointing to the Shop.</div>
+    <div class="box"><b>Occupied cell</b><br>One trap per cell; tapping it shows remaining uses <span class="assume">ASSUMPTION</span>.</div>
+    <div class="box"><b>Not enough money/resources</b><br>Buy and Upgrade buttons are disabled and show what is missing.</div>
+    <div class="box"><b>Final era</b><br>In Era 5 the Upgrade button shows "Max era".</div>
+    <div class="box"><b>Persistence</b><br>Nothing is saved; closing the tab ends the run.</div>
+  </div>
+
+  <h2>📦 Building · Deferred · Non-Goals</h2>
+  <details class="now" open><summary>✅ What We're Building</summary><div><ul>
+    <li>Main Menu (logo, background, Play, How to Play)</li>
+    <li>Game Screen: HUD, grid map with 4 two-cell-wide paths, central castle</li>
+    <li>Click castle for money · Shop + Inventory · trap picker on path cells</li>
+    <li>Traps with limited uses and counter bonuses</li>
+    <li>5 eras × 3 enemies × 3 traps · 20 waves/era with Wave-20 repeat · resource drops · castle damage</li>
+    <li>Castle Upgrade with health restore and full era swap</li>
+    <li>Speed button · Win/Defeat Stats Screen</li>
+  </ul></div></details>
+  <details class="later"><summary>⏸️ Deferred From the POC &amp; Later Enhancements</summary><div><ul>
+    <li>Upgrading individual traps within an era</li>
+    <li>Detailed hand-drawn Kingdom Rush–quality art</li>
+    <li>Saving progress</li>
+    <li>Later: multiple maps &amp; difficulty, sound &amp; music, pause/settings</li>
+  </ul></div></details>
+  <details class="cut"><summary>🚫 Non-Goals</summary><div><ul>
+    <li>Accounts or login</li><li>Installing anything</li><li>Selling traps</li><li>Copying Kingdom Rush / Age of War gameplay</li>
+  </ul></div></details>
+
+  <h2>❓ Open Questions</h2>
+  <div class="box oq tune"><b>1. Wave length &amp; speed levels</b> — assumed ~20–30 s per wave; speed cycles 1× → 2× → 4×. <i>Tune during build.</i></div><br>
+  <div class="box oq tune"><b>2. Balance numbers</b> — money per click, prices, uses (assumed 1/3/5), damage, health, drops, upgrade costs, old-trap refund (assumed price × remaining uses ÷ total uses). <i>Tune during build.</i></div>
+
+  <footer class="muted">The canonical document is <code>devpost/prd.md</code>. This page is a visual companion.</footer>
+</main>
+<script>
+  const steps = [
+    ["Main Menu","The player opens the link and sees the logo over a themed background, a Play button, and a How to Play button."],
+    ["Main Menu → Game","Clicking Play opens the Game Screen in Era 1 (Prehistoric Cave), Wave 1. The castle sits in the center; 4 two-cell-wide paths lead to it from N, S, E, W."],
+    ["Game Screen","The player clicks the castle to earn money."],
+    ["Shop","The player opens the Shop (middle-left button), buys this era's traps, and they go into the Inventory."],
+    ["Placing traps","The player taps a path cell; a picker shows Inventory traps with counts; tapping one places it."],
+    ["Waves","Waves start automatically. Enemies walk the 4 paths. Stepping on a trap damages the enemy and uses 1 of the trap's uses."],
+    ["Drops","Killed enemies drop stone, wood, and gold."],
+    ["Castle hit","Enemies that reach the castle damage it and disappear."],
+    ["Upgrade","With enough resources, Upgrade (above the health bar) works any time: new era castle, scenery, Shop traps, health restored, next wave = Wave 1 of the new era. Old-era traps (map + Inventory) disappear and are refunded as money, plus a bonus worth 2 of the new era's cheapest trap."],
+    ["Stuck era","Finish Wave 20 without upgrading → Wave 20 of that era repeats until the player upgrades."],
+    ["Stats Screen","Win: survive Wave 20 of Era 5. Lose: castle health reaches 0. Both show time to finish, enemies killed, money remaining."]
+  ];
+  let cur = 0;
+  const stepper = document.getElementById("stepper");
+  steps.forEach((s,i)=>{ const b=document.createElement("button"); b.textContent=i+1; b.setAttribute("aria-label","Step "+(i+1)); b.onclick=()=>go(i); stepper.appendChild(b); });
+  function go(i){ cur=Math.max(0,Math.min(steps.length-1,i));
+    document.getElementById("stepScreen").textContent="Step "+(cur+1)+" · "+steps[cur][0];
+    document.getElementById("stepText").textContent=steps[cur][1];
+    [...stepper.children].forEach((b,j)=>b.setAttribute("aria-pressed",String(j===cur))); }
+  document.getElementById("prev").onclick=()=>go(cur-1);
+  document.getElementById("next").onclick=()=>go(cur+1);
+  go(0);
+
+  const hot = {
+    wave:"Top-left: current era and wave (e.g., Wave 7/20), plus the speed button (assumed 1× → 2× → 4×).",
+    res:"Top-right: money (from clicking the castle) and stone, wood, gold (dropped by enemies).",
+    shop:"Middle-left Shop button: opens the Shop (buy this era's 3 traps; no selling) and shows the Inventory with counts.",
+    up:"Upgrade button above the health bar: usable any time you can afford it; disabled and shows what's missing otherwise; 'Max era' in Era 5.",
+    hp:"Castle health bar, above the castle. Enemies reaching the castle lower it. Upgrading refills it. 0 = Defeat.",
+    castle:"The castle: click it for money (+money pop-up). Its art changes with each era.",
+    cell:"A path cell (paths are 2 cells wide). Tap it to open the trap picker from your Inventory. One trap per cell."
+  };
+  const info = document.getElementById("hotinfo");
+  document.querySelectorAll("#mock [data-k]").forEach(el=>{
+    const f=()=>{ document.querySelectorAll("#mock .active").forEach(x=>x.classList.remove("active")); el.classList.add("active"); info.textContent=hot[el.dataset.k]; };
+    el.addEventListener("click",f); el.addEventListener("keydown",e=>{ if(e.key==="Enter") f(); });
+  });
+
+  const features = [
+    ["👆 Clicking the Castle","Each click adds money and shows a small +money pop-up.",["Clicking the castle visibly increases the money counter."]],
+    ["🛒 Shop and Inventory","The Shop lists the current era's 3 traps with price and uses. Cheapest has 1 use; pricier traps have more. Buying adds to the Inventory. No selling.",
+      ["Buying lowers money by the price and raises the Inventory count by 1.","Unaffordable traps can't be bought.","There is no sell option."]],
+    ["🪤 Placing Traps","The map is a grid; paths are 2 cells wide. Tap a path cell → picker with Inventory traps → tap one to place it.",
+      ["Choosing a trap places it on the cell and lowers its count.","Tapping a non-path cell does nothing."]],
+    ["💥 Traps in Action","Stepping on a trap damages the enemy and uses 1 use; 0 uses → trap disappears. Counter traps hit everyone, but hit their type harder.",
+      ["Enemy loses health and the trap's uses drop by 1.","Countered type takes visibly more damage.","A 1-use trap disappears after one step."]],
+    ["👹 Waves and Enemies","Waves auto-start; enemies come from all 4 directions. 3 enemy types per era, 20 waves per era. Kills drop stone/wood/gold. Reaching the castle = damage, then vanish.",
+      ["Enemies appear from all 4 edges and walk to the castle.","Kills increase stone/wood/gold.","An enemy at the castle lowers health and vanishes."]],
+    ["⏩ Speed Button","Speeds up the game so a full run fits a demo.",["Pressing it visibly speeds up enemies, spawns, and waves; pressing again changes speed back."]],
+    ["⬆️ Castle Upgrade and Eras","Usable any time resources allow. Spends resources; new castle art; health restored; new scenery; Shop switches eras; next wave = Wave 1 of the new era. Old-era traps (map + Inventory) disappear and are refunded as money; bonus money = 2 of the new era's cheapest trap. Era 5 is the last.",
+      ["Upgrade changes castle, scenery, Shop, enemies, and refills health.","No old-era traps remain; money rises by refund + era bonus.","The era bonus alone buys 2 of the new era's cheapest trap.","Without enough resources the button is disabled and shows what's needed.","After Wave 20 without upgrading, Wave 20 repeats."]],
+    ["📊 Stats Screen","Shown on win or loss: time to finish, enemies killed, money remaining. Market Royale results style.",
+      ["Castle health 0 → Defeat stats with the three numbers.","Surviving Era 5 Wave 20 → Win stats with the three numbers."]]
+  ];
+  const fWrap = document.getElementById("features");
+  features.forEach(([t,d,c])=>{ const el=document.createElement("details");
+    el.innerHTML=`<summary>${t}</summary><div><p>${d}</p><b>How we'll know it works</b><ul class="crit">${c.map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
+    fWrap.appendChild(el); });
+
+  const roster = [
+    ["1 · Cave",["Cave runner","Club brute","Mammoth rider"],["Sharpened stakes","Rolling boulder","Fire pit"]],
+    ["2 · Wooden Fort",["Peasant raider","Spearman","Mounted knight"],["Caltrops","Bear trap","Burning oil"]],
+    ["3 · Stone Castle",["Scout","Swordsman","Battering ram"],["Iron spikes","Pendulum blade","Boulder drop"]],
+    ["4 · Pre-modern",["Skirmisher","Musketeer","Cannon cart"],["Tripwire","Powder keg","Buried cannon charge"]],
+    ["5 · Modern",["Motorbike raider","Rifleman","Tank"],["Barbed wire","Landmine","Anti-tank mine"]]
+  ];
+  const roles=["Fast","Standard","Heavy"], uses=["1 (cheap)","3 (mid)","5 (expensive)"];
+  const eb=document.getElementById("eraBtns"), rb=document.getElementById("roster");
+  roster.forEach((r,i)=>{ const b=document.createElement("button"); b.textContent=r[0]; b.onclick=()=>showEra(i); eb.appendChild(b); });
+  function showEra(i){ rb.innerHTML=roster[i][1].map((e,j)=>`<tr><td>${roles[j]}</td><td>${e}</td><td>${roster[i][2][j]}</td><td>${uses[j]}</td></tr>`).join("");
+    [...eb.children].forEach((b,j)=>b.setAttribute("aria-pressed",String(i===j))); }
+  showEra(0);
+</script>
+</body>
+</html>

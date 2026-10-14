@@ -1,0 +1,287 @@
+/* Market Royale-style interface layered over the Phaser canvas. */
+:root {
+  --text: #141f3d;
+  --muted: #406394;
+  --surface: #fff;
+  --inset: #eaf9ff;
+  --line: #dcebf4;
+  --blue: linear-gradient(180deg, #00a5ff, #1259e0);
+  --purple: linear-gradient(180deg, #9a48f8, #5636d5);
+  --orange: linear-gradient(180deg, #ff9e16, #ff6b0a);
+  --green: #35ec00;
+  --green-text: #144509;
+  --yellow: #fff04d;
+  --danger: #c7141f;
+  --btn-shadow: 0 5px 9px rgba(0, 46, 89, 0.14), inset 0 2px 1px rgba(255, 255, 255, 0.25);
+  --soft-shadow: 0 10px 26px rgba(0, 46, 89, 0.13);
+  --font: Fredoka, Inter, ui-rounded, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 30%, #2c4a7a, #0d1a33);
+  font-family: var(--font);
+  color: var(--text);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+#game {
+  position: fixed;
+  inset: 0;
+}
+
+#ui {
+  position: fixed;
+  pointer-events: none;
+  font-size: clamp(10px, calc(16px * var(--ui-scale, 1)), 19px);
+  font-variant-numeric: tabular-nums;
+}
+
+#ui > * {
+  pointer-events: none;
+}
+
+#ui button,
+#ui .card,
+#ui .modal,
+#ui .interactive {
+  pointer-events: auto;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ---------- Buttons and pills ---------- */
+.btn {
+  font-family: var(--font);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 1em;
+  border: 0;
+  border-radius: 32px;
+  padding: 0.7em 1.6em;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: var(--btn-shadow);
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  filter: grayscale(0.7) brightness(0.9);
+  opacity: 0.75;
+}
+
+.btn-green {
+  background: var(--green);
+  color: var(--green-text);
+}
+
+.btn-blue {
+  background: var(--blue);
+}
+
+.btn-purple {
+  background: var(--purple);
+}
+
+.btn-orange {
+  background: var(--orange);
+}
+
+.btn-big {
+  font-size: 1.6em;
+  padding: 0.55em 2.6em;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  background: var(--surface);
+  border-radius: 32px;
+  padding: 0.35em 0.9em 0.35em 0.45em;
+  font-weight: 700;
+  box-shadow: var(--soft-shadow);
+}
+
+.pill-dark {
+  background: rgba(20, 31, 61, 0.78);
+  color: #fff;
+  padding: 0.45em 1em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  backdrop-filter: blur(6px);
+}
+
+.icon {
+  display: inline-flex;
+  width: 1.5em;
+  height: 1.5em;
+}
+
+.icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: 30px;
+  box-shadow: var(--soft-shadow);
+  padding: 1.4em 1.6em;
+}
+
+.card h2 {
+  margin: 0 0 0.6em;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* ---------- Screens ---------- */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.2em;
+}
+
+.menu {
+  background: radial-gradient(ellipse at center, rgba(13, 26, 51, 0.15), rgba(13, 26, 51, 0.6));
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-transform: uppercase;
+  font-weight: 700;
+  line-height: 0.95;
+  color: #fff;
+  text-shadow: 0 4px 0 #1259e0, 0 8px 18px rgba(0, 0, 0, 0.45);
+}
+
+.logo-top {
+  font-size: 4.2em;
+  letter-spacing: 0.02em;
+  -webkit-text-stroke: 0.06em #141f3d;
+  paint-order: stroke fill;
+}
+
+.logo-bottom {
+  margin-top: 0.3em;
+  font-size: 1.6em;
+  letter-spacing: 0.3em;
+  padding: 0.25em 1em;
+  border-radius: 32px;
+  background: var(--orange);
+  text-shadow: none;
+  box-shadow: var(--btn-shadow);
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1em;
+}
+
+.modal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13, 26, 51, 0.45);
+  backdrop-filter: blur(3px);
+}
+
+.how-card {
+  max-width: 30em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.how-card ol {
+  margin: 0 0 1.2em;
+  padding: 0.8em 1em 0.8em 2.4em;
+  background: var(--inset);
+  border-radius: 20px;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.how-card b {
+  color: #1259e0;
+}
+
+/* ---------- HUD ---------- */
+.hud {
+  position: absolute;
+  inset: 0;
+}
+
+.hud-tl,
+.hud-tr {
+  position: absolute;
+  top: 0.8em;
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+}
+
+.hud-tl {
+  left: 0.8em;
+}
+
+.hud-tr {
+  right: 0.8em;
+}
+
+.era-pill .dot {
+  color: var(--yellow);
+}
+
+.res span {
+  min-width: 2.2em;
+  text-align: right;
+}
+
+.res-money {
+  background: var(--yellow);
+}
+
+.bump {
+  animation: bump 0.25s ease;
+}
+
+@keyframes bump {
+  40% {
+    transform: scale(1.12);
+  }
+}
