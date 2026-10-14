@@ -59,7 +59,7 @@ Build mode: fast
   Learner check: Play a run using the speed button, reading How to Play first. Say whether the pace, prices, and difficulty feel right and whether anything feels slow or confusing.
   Commit: `Add speed control, How to Play, and balance pass`
 
-- [ ] **6. Anyone can play from the public link**
+- [x] **6. Anyone can play from the public link**
   Becomes usable: The game runs at https://kelvintrinhsg.github.io/Kingdoms-Dragons-Tower-Defense/ after a push to `main`; README explains how to play and run it.
   Why now: Needs the finished game; the deploy itself is low-risk but must be checked on the real URL before shipping.
   PRD ref: `prd.md > Non-Goals` (no install, no accounts), `scope.md > Who It's For`
@@ -96,5 +96,6 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 - Art is drawn with the Canvas 2D API into Phaser canvas textures (`textures.createCanvas`) at 2x resolution instead of `Graphics.generateTexture` — Phaser 4.2.1's `generateTexture` renders through the Canvas renderer and drops gradients, which the Kingdom Rush look needs. Helpers live in `src/art/palette.js`; a shared `src/world/map.js` places ground, scenery, and castle for both Menu and Game scenes, and `src/ui/layout.js` keeps the HTML overlay aligned with the scaled canvas.
 - Killed enemies now drop money as well as stone/wood/gold, scaled by enemy type and wave toughness, and waves ramp in count, health, and speed — learner feedback at the early checkpoint; `prd.md` (Core Journey step 7, Waves and Enemies, Product Decisions) and `spec.md` (Core Journey, Economy Rules, Wave Manager, Game Data) updated to match. Slices 4–5 build on this: eras 2–5 enemies need a `money` value, and the slice 5 balance pass tunes these numbers.
 - Castle click money now grows per era (`clickMoney` 5/8/12/18/26 in `eras.js`, replacing the single `moneyPerClick`) — the slice 5 balance pass found +5 per click meaningless against Era 5 trap prices. A 4x playtest bot (2 clicks per game-second, upgrading as soon as possible) reached Era 5 in about 2.5 minutes of real time and lost at Era 5 Wave 14, with 82–142 FPS and up to ~90 traps on the map, so the ramp goes from easy to hard without stalling; final tuning is left to the learner's final review.
+- `vite.config.js` also applies the Pages base path to `npm run preview` (`isPreview`) — the first preview check served the build at `/` and every asset 404'd. GitHub Pages was switched on with source "GitHub Actions" through the GitHub API (repo was already public); the workflow uses checkout@v7, setup-node@v7, configure-pages@v6, upload-pages-artifact@v5, deploy-pages@v5. The first run passed and the live URL loads with no console errors.
 - The How to Play panel was built in slice 1 alongside the Main Menu (it was planned for slice 5) — it is a few lines in `menu.js` and avoided shipping a dead button.
 
