@@ -484,9 +484,16 @@ body {
   transition: transform 0.1s ease;
 }
 
-.pick:hover {
+.pick:hover:not(:disabled) {
   transform: translateY(-2px);
   border-color: #00a5ff;
+}
+
+/* Can't afford it: dimmed and not clickable. */
+.pick:disabled {
+  opacity: 0.4;
+  filter: grayscale(0.8);
+  cursor: not-allowed;
 }
 
 .pick img {
@@ -504,6 +511,32 @@ body {
   font-size: 0.75em;
   font-weight: 700;
   padding: 0.1em 0.45em;
+}
+
+.pick-price {
+  position: absolute;
+  left: 50%;
+  bottom: -0.55em;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15em;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-radius: 32px;
+  font-size: 0.7em;
+  font-weight: 700;
+  padding: 0 0.4em 0 0.15em;
+  white-space: nowrap;
+}
+
+.pick-price .icon {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.picker-row:has(.pick-price) {
+  padding-bottom: 0.5em;
 }
 
 .picker-empty {

@@ -14,8 +14,8 @@ Source: `scope.md > What "Working" Looks Like`.
 1. The player opens the link. The **Main Menu** shows the game logo over a themed background, a **Play** button, and a **How to Play** button.
 2. The player clicks **Play**. The **Game Screen** opens in **Era 1 (Prehistoric Cave), Wave 1**. The castle sits in the center of a grid map; 4 paths, each 2 cells wide, lead to it from North, South, East, and West.
 3. The player clicks the castle to earn **money**.
-4. The player opens the **Shop** (button on the middle of the left edge), buys traps of the current era with money, and they go into the **Inventory**.
-5. The player taps a path cell. A picker shows the trap buttons available in the Inventory with their counts; tapping one places that trap on the cell.
+4. The player can open the **Shop** (button on the middle of the left edge) to buy traps of the current era ahead of time; they go into the **Inventory**.
+5. The player taps a path cell. A picker shows the current era's 3 traps: owned ones with their Inventory counts, unowned ones with their price (dimmed if unaffordable). Tapping one places that trap on the cell, buying it on the spot if it isn't owned.
 6. Waves start automatically. Enemies spawn at the map edges and walk the 4 paths toward the castle. Stepping on a trap damages the enemy and uses up one of the trap's uses.
 7. Killed enemies drop **stone, wood, and gold** plus some **money**, which are added to the player's resources.
 8. Enemies that reach the castle damage it and disappear.
@@ -33,7 +33,7 @@ Source: `scope.md > The POC Boundary`.
   - Middle of the left edge: **Shop** button. Opens the **Shop panel** (buy traps) and shows the **Inventory** (each trap type and its count).
   - Center: the **castle**, with its **health bar** above it and the **Upgrade** button above the health bar.
   - Map: a full grid; 4 paths, each 2 cells wide, from each edge to the castle. Era-specific buildings and trees off the paths.
-  - **Trap picker:** appears when a path cell is tapped; lists the trap types in the Inventory with counts.
+  - **Trap picker:** appears when a path cell is tapped; lists the current era's 3 traps — Inventory count on owned ones, price on the rest, unaffordable ones dimmed.
 - **Stats Screen:** a Win or Defeat title, plus **time to finish**, **enemies killed**, and **money remaining**.
 
 ## Look and Feel
@@ -58,8 +58,10 @@ Source: `scope.md > Inspiration & Identity`. Already decided in scope; not re-as
   - [ ] There is no sell option.
 
 ### Placing Traps
-- The whole map is a grid; each path is 2 cells wide. Tapping a path cell opens the trap picker with the Inventory's trap buttons and counts; tapping one places it and reduces its count by 1.
-  - [ ] Tapping a path cell and choosing a trap places it there and lowers its Inventory count.
+- The whole map is a grid; each path is 2 cells wide. Tapping a path cell opens the trap picker with all **3 traps of the current era**. A trap in the Inventory shows its count; tapping it places it and reduces its count by 1. A trap not in the Inventory shows its price; tapping it buys and places it in one step. Traps the player can't afford are dimmed and can't be tapped.
+  - [ ] Tapping a path cell and choosing an owned trap places it there and lowers its Inventory count.
+  - [ ] Choosing an unowned, affordable trap places it there and lowers money by its price.
+  - [ ] Unaffordable traps in the picker are dimmed and do nothing when tapped.
   - [ ] Tapping a cell that is not on a path does nothing.
 
 ### Traps in Action
@@ -115,7 +117,7 @@ Pattern in every era: a fast/light enemy, a standard enemy, a heavy enemy; the c
 
 ## States and Boundaries
 - **First play:** Era 1, Wave 1, empty Inventory, starting money (Assumption: enough for a couple of cheap traps), full castle health.
-- **Empty Inventory:** tapping a path cell shows the picker with a message pointing to the Shop instead of trap buttons.
+- **Empty Inventory and not enough money:** tapping a path cell shows the 3 traps dimmed plus a message telling the player to tap the castle to earn money.
 - **Occupied cell:** one trap per cell; tapping an occupied cell shows that trap's remaining uses instead of the picker (Assumption).
 - **Not enough money / resources:** Shop buy buttons and the Upgrade button are disabled, with the missing amount shown.
 - **Final era:** in Era 5 the Upgrade button is hidden or shows "Max era".
@@ -124,7 +126,7 @@ Pattern in every era: a fast/light enemy, a standard enemy, a heavy enemy; the c
 - **Persistence:** nothing is saved between sessions; closing the tab ends the run (no accounts).
 
 ## Product Decisions
-- Shop buys traps into an Inventory; traps are placed from the Inventory by tapping a path cell — keeps buying and placing separate.
+- Shop buys traps into an Inventory; traps are placed by tapping a path cell. The picker uses an owned trap first, otherwise buys and places in one tap — so the player never has to detour through the Shop (learner request after the final review; replaces the earlier "Inventory empty — open the Shop" message).
 - Traps cannot be sold — once bought, they can only be placed.
 - Traps have limited uses; more expensive means more uses; the cheapest has 1 use.
 - Counter traps damage every enemy but deal extra damage to their countered type.
@@ -144,7 +146,7 @@ Pattern in every era: a fast/light enemy, a standard enemy, a heavy enemy; the c
 - Main Menu (logo, background, Play, How to Play).
 - Game Screen with the HUD above, grid map with 4 two-cell-wide paths, central castle.
 - Clicking the castle for money.
-- Shop + Inventory; trap picker on path cells.
+- Shop + Inventory; trap picker on path cells that also buys on the spot.
 - Traps with limited uses and counter bonuses.
 - 5 eras × 3 enemies × 3 traps; 20 waves per era with Wave-20 repeat; resource drops; castle damage.
 - Castle Upgrade with health restore and full era swap (castle, scenery, Shop, enemies).

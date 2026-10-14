@@ -26,7 +26,7 @@ PRD ref: `prd.md > The Core Journey`.
 2. **Click Play** → the Main Menu emits `ui:play` → `GameScene` starts with a fresh **game state** (Era 1, Wave 1, starting money, full castle health, empty Inventory) → the interface hides the menu and shows the HUD.
 3. **Click the castle** → `GameScene` adds money to the state → emits `state:changed` → the HUD's money counter updates; a "+money" pop-up floats over the castle.
 4. **Open Shop, buy a trap** → the interface emits `ui:buyTrap` → the economy logic checks money, deducts it, adds 1 to the Inventory → `state:changed` → Shop and Inventory update.
-5. **Tap a path cell** → `GameScene` converts the tap to a grid cell; if it is an empty path cell it emits `cell:tapped` with the cell and screen position → the interface opens the **trap picker** there → the player taps a trap → `ui:placeTrap` → `GameScene` places a trap sprite and lowers the Inventory count.
+5. **Tap a path cell** → `GameScene` converts the tap to a grid cell; if it is an empty path cell it emits `cell:tapped` with the cell and screen position → the interface opens the **trap picker** there with the era's 3 traps (owned → count, unowned → price, dimmed if unaffordable) → the player taps a trap → `ui:placeTrap` → `buyAndPlaceTrap` uses an owned trap or buys one on the spot → `GameScene` places a trap sprite → `state:changed`.
 6. **Waves** → the **wave manager** builds each wave from the era data and spawns enemies at the 4 map edges → each enemy walks its lane toward the castle each frame → when it enters a cell with a trap it hasn't hit yet, the trap deals damage (extra against its countered type) and loses 1 use; at 0 uses it is removed.
 7. **Enemy dies** → its stone/wood/gold drop plus money (scaled by the wave's toughness) is added to the state and pops up → `state:changed` → HUD updates; the kill counter goes up.
 8. **Enemy reaches the castle** → castle health drops; the enemy is removed → the health bar above the castle updates.
@@ -99,7 +99,7 @@ Creates the run's state object and holds it during play (see Data Model). Only t
 PRD ref: `prd.md > States and Boundaries`.
 
 ### Economy Rules (`src/logic/economy.js`)
-Pure functions, unit-tested: `clickCastle`, `canAfford`, `buyTrap`, `placeTrap`, `killReward` (drop + money × wave reward multiplier), `addDrop`, `upgradeCost`, `canUpgrade`, `refundTraps` (price × remaining uses ÷ total uses, rounded down), `eraBonus` (2 × cheapest trap of the new era), `applyUpgrade` (spend, refund, bonus, health refill, era + 1, wave reset to 1).
+Pure functions, unit-tested: `clickCastle`, `canAfford`, `buyTrap`, `placeTrap`, `buyAndPlaceTrap` (checks the cell first, then uses an owned trap or buys one — never spends on a failed placement), `killReward` (drop + money × wave reward multiplier), `addDrop`, `upgradeCost`, `canUpgrade`, `refundTraps` (price × remaining uses ÷ total uses, rounded down), `eraBonus` (2 × cheapest trap of the new era), `applyUpgrade` (spend, refund, bonus, health refill, era + 1, wave reset to 1).
 PRD ref: `prd.md > Clicking the Castle`, `prd.md > Shop and Inventory`, `prd.md > Castle Upgrade and Eras`.
 
 ### Combat Rules (`src/logic/combat.js`)
@@ -137,7 +137,7 @@ Plain DOM modules, each rendering into `#ui` and talking only through the bus:
 - `menu.js` — Main Menu (logo wordmark in CSS, Play, How to Play panel). PRD ref: `prd.md > Screens and Layout`.
 - `hud.js` — top-left era/wave + speed button; top-right money/stone/wood/gold; middle-left Shop button. PRD ref: `prd.md > Screens and Layout`, `prd.md > Speed Button`.
 - `shop.js` — Shop panel (3 current-era traps with price, uses, countered enemy, disabled when unaffordable) and Inventory list with counts. No sell option. PRD ref: `prd.md > Shop and Inventory`.
-- `picker.js` — trap picker positioned at the tapped cell; "Inventory empty — open the Shop" message when empty; remaining-uses note for occupied cells. PRD ref: `prd.md > Placing Traps`, `prd.md > States and Boundaries`.
+- `picker.js` — trap picker positioned at the tapped cell, showing the era's 3 traps (Inventory count or price; unaffordable ones disabled and dimmed, re-rendered on `state:changed`); a "tap the castle to earn more" message when nothing is owned or affordable; remaining-uses note for occupied cells. PRD ref: `prd.md > Placing Traps`, `prd.md > States and Boundaries`.
 - `upgrade.js` — Upgrade button kept positioned above the castle's health bar (follows `castle:moved` and window resize); disabled with missing amounts listed; "MAX ERA" in Era 5. PRD ref: `prd.md > Castle Upgrade and Eras`.
 - `stats.js` — Win/Defeat Stats Screen with time, kills, money; Play Again and Main Menu buttons. PRD ref: `prd.md > Stats Screen`.
 - `styles.css` — Market Royale variables and components.

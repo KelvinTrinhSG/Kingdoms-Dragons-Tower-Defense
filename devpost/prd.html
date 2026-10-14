@@ -140,7 +140,7 @@
   <h2>🚦 States and Boundaries</h2>
   <div class="two">
     <div class="box"><b>First play</b><br>Era 1, Wave 1, empty Inventory, some starting money <span class="assume">ASSUMPTION</span>, full castle health.</div>
-    <div class="box"><b>Empty Inventory</b><br>Tapping a path cell shows a message pointing to the Shop.</div>
+    <div class="box"><b>Empty Inventory, no money</b><br>The picker shows the 3 traps dimmed and tells the player to tap the castle to earn money.</div>
     <div class="box"><b>Occupied cell</b><br>One trap per cell; tapping it shows remaining uses <span class="assume">ASSUMPTION</span>.</div>
     <div class="box"><b>Not enough money/resources</b><br>Buy and Upgrade buttons are disabled and show what is missing.</div>
     <div class="box"><b>Final era</b><br>In Era 5 the Upgrade button shows "Max era".</div>
@@ -179,7 +179,7 @@
     ["Main Menu → Game","Clicking Play opens the Game Screen in Era 1 (Prehistoric Cave), Wave 1. The castle sits in the center; 4 two-cell-wide paths lead to it from N, S, E, W."],
     ["Game Screen","The player clicks the castle to earn money."],
     ["Shop","The player opens the Shop (middle-left button), buys this era's traps, and they go into the Inventory."],
-    ["Placing traps","The player taps a path cell; a picker shows Inventory traps with counts; tapping one places it."],
+    ["Placing traps","The player taps a path cell; a picker shows the era's 3 traps (owned → count, unowned → price, dimmed if unaffordable); tapping one places it, buying it on the spot if needed."],
     ["Waves","Waves start automatically. Enemies walk the 4 paths. Stepping on a trap damages the enemy and uses 1 of the trap's uses."],
     ["Drops","Killed enemies drop stone, wood, and gold, plus money — more for tougher enemies and later waves."],
     ["Castle hit","Enemies that reach the castle damage it and disappear."],
@@ -205,7 +205,7 @@
     up:"Upgrade button above the health bar: usable any time you can afford it; disabled and shows what's missing otherwise; 'Max era' in Era 5.",
     hp:"Castle health bar, above the castle. Enemies reaching the castle lower it. Upgrading refills it. 0 = Defeat.",
     castle:"The castle: click it for money (+money pop-up). Its art changes with each era.",
-    cell:"A path cell (paths are 2 cells wide). Tap it to open the trap picker from your Inventory. One trap per cell."
+    cell:"A path cell (paths are 2 cells wide). Tap it to open the trap picker: place an owned trap or buy one on the spot. One trap per cell."
   };
   const info = document.getElementById("hotinfo");
   document.querySelectorAll("#mock [data-k]").forEach(el=>{
@@ -217,8 +217,8 @@
     ["👆 Clicking the Castle","Each click adds money and shows a small +money pop-up.",["Clicking the castle visibly increases the money counter."]],
     ["🛒 Shop and Inventory","The Shop lists the current era's 3 traps with price and uses. Cheapest has 1 use; pricier traps have more. Buying adds to the Inventory. No selling.",
       ["Buying lowers money by the price and raises the Inventory count by 1.","Unaffordable traps can't be bought.","There is no sell option."]],
-    ["🪤 Placing Traps","The map is a grid; paths are 2 cells wide. Tap a path cell → picker with Inventory traps → tap one to place it.",
-      ["Choosing a trap places it on the cell and lowers its count.","Tapping a non-path cell does nothing."]],
+    ["🪤 Placing Traps","The map is a grid; paths are 2 cells wide. Tap a path cell → picker with the era's 3 traps → tap one to place it (owned ones are free, others are bought on the spot).",
+      ["Choosing an owned trap places it on the cell and lowers its count.","Choosing an unowned, affordable trap places it and lowers money by its price.","Unaffordable traps are dimmed and can't be tapped.","Tapping a non-path cell does nothing."]],
     ["💥 Traps in Action","Stepping on a trap damages the enemy and uses 1 use; 0 uses → trap disappears. Counter traps hit everyone, but hit their type harder.",
       ["Enemy loses health and the trap's uses drop by 1.","Countered type takes visibly more damage.","A 1-use trap disappears after one step."]],
     ["👹 Waves and Enemies","Waves auto-start; enemies come from all 4 directions. 3 enemy types per era, 20 waves per era. Waves ramp from few/slow/weak to many/fast/tanky. Kills drop stone/wood/gold plus money. Reaching the castle = damage, then vanish.",

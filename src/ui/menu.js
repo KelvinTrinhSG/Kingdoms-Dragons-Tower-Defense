@@ -18,8 +18,8 @@ export function initMenu(root) {
         <h2>How to Play</h2>
         <ol>
           <li><b>Click the castle</b> to earn money.</li>
-          <li>Open the <b>Shop</b> and buy traps.</li>
-          <li><b>Tap a path cell</b> to place a trap. Enemies come from all 4 sides.</li>
+          <li><b>Tap a path cell</b> and pick a trap — it's bought and placed in one tap. Enemies come from all 4 sides.</li>
+          <li>Or stock up on traps in the <b>Shop</b>.</li>
           <li>Killed enemies drop <b>stone, wood, and gold</b>.</li>
           <li>Press <b>Upgrade</b> to evolve your castle into the next era.</li>
           <li>Survive Wave 20 of the Modern era to win!</li>

@@ -5,7 +5,7 @@ import { LANES, CASTLE_CENTER, CELL, cellAt, cellCenter, isPathCell } from '../w
 import { Enemy } from '../world/Enemy.js';
 import { Trap } from '../world/Trap.js';
 import { createState, snapshot } from '../logic/state.js';
-import { clickCastle, buyTrap, placeTrap, trapAt, addDrop, killReward, applyUpgrade } from '../logic/economy.js';
+import { clickCastle, buyTrap, buyAndPlaceTrap, trapAt, addDrop, killReward, applyUpgrade } from '../logic/economy.js';
 import { castleHit, hitTrap } from '../logic/combat.js';
 import { buildWave, nextWave } from '../logic/waves.js';
 import { BALANCE } from '../data/balance.js';
@@ -47,7 +47,7 @@ export class GameScene extends Phaser.Scene {
       if (buyTrap(this.state, id)) this.emitState();
     });
     this.listen('ui:placeTrap', ({ trapId, col, row }) => {
-      const trap = placeTrap(this.state, trapId, col, row);
+      const trap = buyAndPlaceTrap(this.state, trapId, col, row);
       this.selection.setVisible(false);
       if (!trap) return;
       this.trapViews.set(trap.id, new Trap(this, trap));

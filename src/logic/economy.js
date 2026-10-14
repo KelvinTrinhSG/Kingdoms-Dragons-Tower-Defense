@@ -41,6 +41,14 @@ export function placeTrap(state, id, col, row) {
   return trap;
 }
 
+// Place a trap straight from the picker: use one from the Inventory if owned,
+// otherwise buy it on the spot. Nothing is spent if the cell can't take a trap.
+export function buyAndPlaceTrap(state, id, col, row) {
+  if (state.over || !isPathCell(col, row) || trapAt(state, col, row)) return null;
+  if (!(state.inventory[id] > 0) && !buyTrap(state, id)) return null;
+  return placeTrap(state, id, col, row);
+}
+
 // What killing an enemy gives: its stone/wood/gold plus money scaled by the wave's toughness.
 export function killReward(enemyDef, rewardMul = 1) {
   return { money: Math.round(enemyDef.money * rewardMul), ...enemyDef.drop };

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createState } from '../src/logic/state.js';
-import { clickCastle, buyTrap, placeTrap, addDrop, trapAt, killReward, canUpgrade, missingForUpgrade, applyUpgrade, refundTraps, eraBonus, upgradeCost } from '../src/logic/economy.js';
+import { clickCastle, buyTrap, placeTrap, buyAndPlaceTrap, addDrop, trapAt, killReward, canUpgrade, missingForUpgrade, applyUpgrade, refundTraps, eraBonus, upgradeCost } from '../src/logic/economy.js';
 import { BALANCE } from '../src/data/balance.js';
 import { trapDef, ERAS } from '../src/data/eras.js';
 
@@ -83,6 +83,36 @@ describe('placeTrap', () => {
     expect(placeTrap(s, 't1-cheap', 15, 3)).not.toBeNull();
     expect(placeTrap(s, 't1-cheap', 15, 3)).toBeNull(); // occupied
     expect(placeTrap(s, 't1-mid', 16, 3)).toBeNull(); // none owned
+  });
+});
+
+describe('buyAndPlaceTrap', () => {
+  it('buys and places in one step when none are owned', () => {
+    const s = createState({ money: 100 });
+    const t = buyAndPlaceTrap(s, 't1-cheap', 15, 3);
+    expect(t).toMatchObject({ trapId: 't1-cheap', col: 15, row: 3 });
+    expect(s.money).toBe(100 - trapDef('t1-cheap').price);
+    expect(s.inventory['t1-cheap']).toBe(0);
+  });
+
+  it('uses an owned trap first without spending money', () => {
+    const s = createState({ money: 100 });
+    buyTrap(s, 't1-cheap');
+    const money = s.money;
+    expect(buyAndPlaceTrap(s, 't1-cheap', 15, 3)).not.toBeNull();
+    expect(s.money).toBe(money);
+  });
+
+  it('spends nothing when unaffordable or the cell is taken', () => {
+    const s = createState({ money: 5 });
+    expect(buyAndPlaceTrap(s, 't1-expensive', 15, 3)).toBeNull();
+    expect(s.money).toBe(5);
+    s.money = 100;
+    buyAndPlaceTrap(s, 't1-cheap', 15, 3);
+    const money = s.money;
+    expect(buyAndPlaceTrap(s, 't1-cheap', 15, 3)).toBeNull();
+    expect(buyAndPlaceTrap(s, 't1-cheap', 2, 2)).toBeNull(); // grass
+    expect(s.money).toBe(money);
   });
 });
 

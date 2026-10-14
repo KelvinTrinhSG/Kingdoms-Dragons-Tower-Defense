@@ -1,6 +1,6 @@
 import { bus } from '../bus.js';
 import { eraTrapIds, trapDef } from '../data/eras.js';
-import { trapIcons } from './icons.js';
+import { ICONS, trapIcons } from './icons.js';
 import { worldToUi } from './layout.js';
 
 // The trap picker that pops up at a tapped path cell.
@@ -32,24 +32,36 @@ export function initPicker(root) {
     el.style.top = `${top}px`;
   };
 
-  bus.on('state:changed', (s) => (state = s));
+  // All 3 current-era traps. Owned ones show their count and place for free;
+  // the rest show their price and are bought on the spot, dimmed when unaffordable.
+  const renderTraps = () => {
+    const ids = eraTrapIds(state.era);
+    const buttons = ids
+      .map((id) => {
+        const t = trapDef(id);
+        const owned = state.inventory[id] > 0;
+        const ok = owned || state.money >= t.price;
+        const badge = owned
+          ? `<span class="pick-count">${state.inventory[id]}</span>`
+          : `<span class="pick-price"><i class="icon">${ICONS.money}</i>${t.price}</span>`;
+        return `<button class="pick" data-pick="${id}" title="${t.name}" ${ok ? '' : 'disabled'}><img src="${trapIcons[id] ?? ''}" alt="" />${badge}</button>`;
+      })
+      .join('');
+    const stuck = ids.every((id) => !(state.inventory[id] > 0) && state.money < trapDef(id).price);
+    const hint = stuck ? '<div class="picker-empty">Not enough money — tap the castle to earn more!</div>' : '';
+    show(cell.x, cell.y, `<div class="picker-row">${buttons}</div>${hint}`);
+  };
+
+  bus.on('state:changed', (s) => {
+    state = s;
+    // Keep an open picker in step with money (castle clicks, kills) while it's up.
+    if (cell && !el.classList.contains('hidden')) renderTraps();
+  });
 
   bus.on('cell:tapped', (c) => {
     if (!state) return;
     cell = c;
-    const owned = eraTrapIds(state.era).filter((id) => state.inventory[id] > 0);
-    if (!owned.length) {
-      show(c.x, c.y, `<div class="picker-empty">Inventory empty — open the Shop</div>
-        <button class="btn btn-orange btn-small" data-act="shop">Open Shop</button>`);
-      return;
-    }
-    show(
-      c.x,
-      c.y,
-      `<div class="picker-row">${owned
-        .map((id) => `<button class="pick" data-pick="${id}" title="${trapDef(id).name}"><img src="${trapIcons[id] ?? ''}" alt="" /><span class="pick-count">${state.inventory[id]}</span></button>`)
-        .join('')}</div>`,
-    );
+    renderTraps();
   });
 
   bus.on('cell:info', (c) => {
@@ -59,14 +71,11 @@ export function initPicker(root) {
 
   el.addEventListener('click', (e) => {
     const pick = e.target.closest('[data-pick]');
-    if (pick && cell) {
-      bus.emit('ui:placeTrap', { trapId: pick.dataset.pick, col: cell.col, row: cell.row });
+    if (pick && !pick.disabled && cell) {
+      const { col, row } = cell;
       el.classList.add('hidden');
       cell = null;
-    }
-    if (e.target.closest('[data-act="shop"]')) {
-      close();
-      bus.emit('ui:openShop');
+      bus.emit('ui:placeTrap', { trapId: pick.dataset.pick, col, row });
     }
   });
 
