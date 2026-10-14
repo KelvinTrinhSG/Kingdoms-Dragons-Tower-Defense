@@ -83,15 +83,15 @@ Learner tried the live build and asked for no changes ("quá tuyệt vời rồi
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
+- [x] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
+- [x] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
 - [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: Guided route offered, tied to the goal of understanding Phaser: follow one castle click through Phaser input, the pure rule, and the HTML HUD. Not yet completed. Map checked offline (renders, no console errors; Phaser docs links return 200) from commit `c959294`.
-Route and stops: reference route in the map — `src/scenes/GameScene.js` `setupCastle()` → `src/logic/economy.js` `clickCastle(state)` → `src/ui/hud.js` `bus.on('state:changed'`.
-Edit outcome: optional edit offered (Era 1 `clickMoney` in `src/data/eras.js`); pending.
-Reflection: not yet offered.
-Activity mode: live app and editor (pending).
+Activity and evidence: Brief recap only. The guided route (one castle click through Phaser input, the pure rule, and the HTML HUD) was explained in chat and offered hands-on; the learner chose to move on to `6-ship`, so no stops were toured live. Map checked offline (renders, no console errors; Phaser docs links return 200) from commit `c959294`.
+Route and stops: reference-only route in the map — `src/scenes/GameScene.js` `setupCastle()` → `src/logic/economy.js` `clickCastle(state)` → `src/ui/hud.js` `bus.on('state:changed'`.
+Edit outcome: offered (Era 1 `clickMoney` in `src/data/eras.js`); declined by moving on. No code changed.
+Reflection: not offered — learner moved on to shipping.
+Activity mode: recap with app map as a reference for later reading.
 
 ## Revisions
 
