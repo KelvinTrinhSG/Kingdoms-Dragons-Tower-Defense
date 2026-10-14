@@ -1,13 +1,14 @@
-﻿import { BALANCE } from '../data/balance.js';
 import { trapDef, eraData, eraTrapIds, LAST_ERA } from '../data/eras.js';
 import { isPathCell } from '../world/grid.js';
 
 // Rules for money and resources. No Phaser here, so they can be unit-tested.
 
+// Each click earns the current era's click money (later castles are worth more per click).
 export function clickCastle(state) {
   if (state.over) return 0;
-  state.money += BALANCE.moneyPerClick;
-  return BALANCE.moneyPerClick;
+  const amount = eraData(state.era).clickMoney;
+  state.money += amount;
+  return amount;
 }
 
 export function canAfford(state, price) {

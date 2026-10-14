@@ -49,7 +49,7 @@ Build mode: fast
   Learner check: Open `http://localhost:5173/?res=999&money=5000`, press PLAY, place a few traps, then press UPGRADE repeatedly. Each time the castle, trees/buildings, Shop traps, and enemies should change era. Then open `?era=5&wave=20&money=5000`, defend, and see VICTORY.
   Commit: `Add castle upgrades across all 5 eras with win condition`
 
-- [ ] **5. Speed button, How to Play, and a smooth, balanced run**
+- [x] **5. Speed button, How to Play, and a smooth, balanced run**
   Becomes usable: The speed button cycles 1× → 2× → 4× (enemies, spawns, waves, pop-ups), How to Play explains the loop, and the balance lets a real run go from Era 1 to a win or loss without stalling. Holds up with many enemies at 4×.
   Why now: Needs the whole game in place to tune; delivers the learner's "game runs smoothly" goal and makes a full run demo-able.
   PRD ref: `prd.md > Speed Button`, `prd.md > Screens and Layout` (How to Play), `prd.md > Open Questions`
@@ -95,5 +95,6 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 
 - Art is drawn with the Canvas 2D API into Phaser canvas textures (`textures.createCanvas`) at 2x resolution instead of `Graphics.generateTexture` — Phaser 4.2.1's `generateTexture` renders through the Canvas renderer and drops gradients, which the Kingdom Rush look needs. Helpers live in `src/art/palette.js`; a shared `src/world/map.js` places ground, scenery, and castle for both Menu and Game scenes, and `src/ui/layout.js` keeps the HTML overlay aligned with the scaled canvas.
 - Killed enemies now drop money as well as stone/wood/gold, scaled by enemy type and wave toughness, and waves ramp in count, health, and speed — learner feedback at the early checkpoint; `prd.md` (Core Journey step 7, Waves and Enemies, Product Decisions) and `spec.md` (Core Journey, Economy Rules, Wave Manager, Game Data) updated to match. Slices 4–5 build on this: eras 2–5 enemies need a `money` value, and the slice 5 balance pass tunes these numbers.
+- Castle click money now grows per era (`clickMoney` 5/8/12/18/26 in `eras.js`, replacing the single `moneyPerClick`) — the slice 5 balance pass found +5 per click meaningless against Era 5 trap prices. A 4x playtest bot (2 clicks per game-second, upgrading as soon as possible) reached Era 5 in about 2.5 minutes of real time and lost at Era 5 Wave 14, with 82–142 FPS and up to ~90 traps on the map, so the ramp goes from easy to hard without stalling; final tuning is left to the learner's final review.
 - The How to Play panel was built in slice 1 alongside the Main Menu (it was planned for slice 5) — it is a few lines in `menu.js` and avoided shipping a dead button.
 

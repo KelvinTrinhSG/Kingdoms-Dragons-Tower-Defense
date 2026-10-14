@@ -2,6 +2,7 @@
 // Enemy speed is in pixels per second; damage is what it does to the castle on arrival;
 // money + drop is what a kill gives (money grows with the wave's toughness).
 // Each trap counters one enemy role (cheap->fast, mid->standard, expensive->heavy).
+// clickMoney is what one castle click earns in that era.
 // upgradeCost is what it takes to move on to the NEXT era (none for the last era).
 export const TIERS = ['cheap', 'mid', 'expensive'];
 
@@ -12,6 +13,7 @@ export const ERAS = [
     id: 1,
     name: 'Prehistoric Cave',
     castleHp: 100,
+    clickMoney: 5,
     upgradeCost: drop(50, 70, 12),
     enemies: {
       fast: { name: 'Cave runner', hp: 10, speed: 46, damage: 4, money: 2, drop: drop(1, 2, 0) },
@@ -28,6 +30,7 @@ export const ERAS = [
     id: 2,
     name: 'Wooden Fort',
     castleHp: 160,
+    clickMoney: 8,
     upgradeCost: drop(110, 140, 30),
     enemies: {
       fast: { name: 'Peasant raider', hp: 18, speed: 50, damage: 6, money: 3, drop: drop(2, 3, 0) },
@@ -44,6 +47,7 @@ export const ERAS = [
     id: 3,
     name: 'Stone Castle',
     castleHp: 240,
+    clickMoney: 12,
     upgradeCost: drop(200, 220, 55),
     enemies: {
       fast: { name: 'Scout', hp: 30, speed: 54, damage: 8, money: 4, drop: drop(3, 3, 1) },
@@ -60,6 +64,7 @@ export const ERAS = [
     id: 4,
     name: 'Pre-modern Barracks',
     castleHp: 340,
+    clickMoney: 18,
     upgradeCost: drop(320, 340, 90),
     enemies: {
       fast: { name: 'Skirmisher', hp: 50, speed: 58, damage: 10, money: 6, drop: drop(4, 4, 1) },
@@ -76,6 +81,7 @@ export const ERAS = [
     id: 5,
     name: 'Modern Barracks',
     castleHp: 460,
+    clickMoney: 26,
     upgradeCost: null,
     enemies: {
       fast: { name: 'Motorbike raider', hp: 80, speed: 66, damage: 14, money: 8, drop: drop(5, 5, 2) },

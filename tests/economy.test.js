@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { createState } from '../src/logic/state.js';
 import { clickCastle, buyTrap, placeTrap, addDrop, trapAt, killReward, canUpgrade, missingForUpgrade, applyUpgrade, refundTraps, eraBonus, upgradeCost } from '../src/logic/economy.js';
 import { BALANCE } from '../src/data/balance.js';
@@ -21,11 +21,12 @@ describe('createState', () => {
 });
 
 describe('clickCastle', () => {
-  it('adds money per click', () => {
+  it("adds the era's click money, which grows with each era", () => {
     const s = createState();
     const gained = clickCastle(s);
-    expect(gained).toBe(BALANCE.moneyPerClick);
-    expect(s.money).toBe(BALANCE.startMoney + BALANCE.moneyPerClick);
+    expect(gained).toBe(ERAS[0].clickMoney);
+    expect(s.money).toBe(BALANCE.startMoney + gained);
+    for (let i = 1; i < ERAS.length; i++) expect(ERAS[i].clickMoney).toBeGreaterThan(ERAS[i - 1].clickMoney);
   });
 
   it('does nothing after the game is over', () => {

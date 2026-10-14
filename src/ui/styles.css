@@ -267,6 +267,20 @@ body {
   color: var(--yellow);
 }
 
+.speed-btn {
+  min-width: 4.6em;
+  justify-content: center;
+}
+
+.speed-btn .ff {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+.speed-btn.fast {
+  background: var(--orange);
+}
+
 .res span {
   min-width: 2.2em;
   text-align: right;

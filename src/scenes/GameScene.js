@@ -27,6 +27,8 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     this.state = createState(this.devOpts);
+    this.time.timeScale = 1;
+    this.tweens.timeScale = 1;
     this.world = buildWorld(this, this.state.era);
     this.enemies = [];
     this.trapViews = new Map(); // trap id -> Trap sprite
@@ -53,6 +55,15 @@ export class GameScene extends Phaser.Scene {
     });
     this.listen('ui:pickerClosed', () => this.selection.setVisible(false));
     this.listen('ui:upgrade', () => this.upgrade());
+    this.listen('ui:speed', () => {
+      // Cycle 1x -> 2x -> 4x -> 1x. Movement uses state.speed in update();
+      // timers and tweens (pop-ups, flashes) follow through their time scales.
+      const speeds = BALANCE.speeds;
+      this.state.speed = speeds[(speeds.indexOf(this.state.speed) + 1) % speeds.length];
+      this.time.timeScale = this.state.speed;
+      this.tweens.timeScale = this.state.speed;
+      this.emitState();
+    });
     this.listen('ui:menu', () => this.scene.start('Menu'));
     this.listen('ui:restart', () => this.scene.restart());
     bus.emit('scene:game');
