@@ -110,6 +110,10 @@ PRD ref: `prd.md > Traps in Action`, `prd.md > Waves and Enemies`.
 `buildWave(era, waveNumber)` returns a list of spawns (enemy type, direction, lane, delay) from the era data plus health, speed, and reward multipliers: Wave 1 is small, slow, and weak; enemy count, health, and speed grow with the wave number; heavier enemies appear more in later waves; the money reward grows with the health multiplier; enemies are spread across all 4 directions. Unit-tested. `GameScene` runs the spawn timer, detects wave end (all spawned and none alive), waits a short break (~3 s), then starts the next wave: Wave + 1, or Wave 20 again if Wave 20 just ended without an upgrade. Clearing Era 5 Wave 20 triggers a win. Before Wave 1 of a run (`firstWaveDelay`, 6 s) and of each new era (`upgradeBreak`, 7 s), `setupCountdown`/`tickCountdown` show a non-interactive Phaser text notice — "GET READY!" or the new era's name, plus "Enemies arrive in Ns" — removed when the wave starts.
 PRD ref: `prd.md > Waves and Enemies`, `prd.md > Castle Upgrade and Eras`.
 
+### Sound (`src/audio/sound.js`)
+Web Audio synth, no audio files (Phaser's own audio is off: `audio: { noAudio: true }`). The context is created on the first pointer/key press. `playSfx(name)` plays short oscillator/noise effects with a per-sound minimum gap so 4× speed doesn't pile up; `startMusic`/`stopMusic` run a look-ahead scheduler for an Am–F–C–G loop at 112 BPM; `setMuted` drives a master gain (HUD speaker button). The context suspends while the tab is hidden. `GameScene` calls `playSfx` at game moments; `main.js` wires UI clicks, music per run/pause, and the win/lose jingle.
+PRD ref: `prd.md > Sound`.
+
 ### Grid and Paths (`src/world/grid.js`)
 Defines the 32×20 grid of 40px cells (1280×800). The castle occupies the center block (cols 14–17, rows 8–11). Four straight paths, each 2 cells wide: North (cols 15–16, rows 0–7), South (cols 15–16, rows 12–19), West (rows 9–10, cols 0–13), East (rows 9–10, cols 18–31). Helpers: `isPathCell`, `cellAt(x,y)`, `cellCenter`, and each lane's waypoint list from the edge to the castle.
 PRD ref: `prd.md > Placing Traps`, `prd.md > Screens and Layout`.
@@ -137,6 +141,7 @@ Plain DOM modules, each rendering into `#ui` and talking only through the bus:
 - `menu.js` — Main Menu (logo wordmark in CSS, Play, How to Play panel). PRD ref: `prd.md > Screens and Layout`.
 - `hud.js` — top-left era/wave + speed button; top-right money/stone/wood/gold; middle-left Shop button. PRD ref: `prd.md > Screens and Layout`, `prd.md > Speed Button`.
 - `shop.js` — Shop panel (3 current-era traps with price, uses, countered enemy, disabled when unaffordable) and Inventory list with counts. No sell option. PRD ref: `prd.md > Shop and Inventory`.
+- `pause.js` — "Paused" overlay (Resume, Main Menu) and the P/Esc shortcut; `GameScene.setPaused` freezes the frame loop, scene clock, tweens, and world input, and shifts `startedAt` so paused time isn't counted. PRD ref: `prd.md > Pause`.
 - `picker.js` — trap picker positioned at the tapped cell, showing the era's 3 traps (Inventory count or price; unaffordable ones disabled and dimmed, re-rendered on `state:changed`); a "tap the castle to earn more" message when nothing is owned or affordable; remaining-uses note for occupied cells. PRD ref: `prd.md > Placing Traps`, `prd.md > States and Boundaries`.
 - `upgrade.js` — Upgrade button kept positioned above the castle's health bar (follows `castle:moved` and window resize); disabled with missing amounts listed; "MAX ERA" in Era 5. PRD ref: `prd.md > Castle Upgrade and Eras`.
 - `stats.js` — Win/Defeat Stats Screen with time, kills, money; Play Again and Main Menu buttons. PRD ref: `prd.md > Stats Screen`.

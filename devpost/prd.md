@@ -88,6 +88,14 @@ Source: `scope.md > Inspiration & Identity`. Already decided in scope; not re-as
 - A speed button speeds up the game so a full run can be shown in a short demo.
   - [ ] Pressing the speed button makes enemies, spawns, and waves visibly run faster; pressing again changes the speed back.
 
+### Pause
+- A pause button on the HUD (also **P** or **Esc**) freezes the game and shows a "Paused" panel with **Resume** and **Main Menu**. Time spent paused doesn't count toward the run time.
+  - [ ] While paused, enemies, wave timers, countdowns, and music stop, and the castle, path cells, and Upgrade don't respond; Resume continues exactly where it stopped.
+
+### Sound
+- Sound effects for castle clicks, placing and triggering traps, kills, castle hits, countdown ticks, wave starts, upgrades, win/lose, and UI buttons, plus a looping background tune during a run. A speaker button on the HUD mutes everything. Sound starts after the player's first tap (a browser rule).
+  - [ ] Each of those actions makes a sound, music plays during a run and stops on pause/game over, and the mute button silences everything.
+
 ### Castle Upgrade and Eras
 - The Upgrade button above the health bar is usable whenever the player has enough stone, wood, and gold, even mid-era.
 - Upgrading: spends the resources, moves the castle to the next era (new castle art), **restores castle health**, swaps the map's buildings and trees to the new era, switches the Shop to the new era's traps, and makes the next wave **Wave 1 of the new era** with the new era's enemies.
@@ -157,7 +165,7 @@ Pattern in every era: a fast/light enemy, a standard enemy, a heavy enemy; the c
 - Traps with limited uses and counter bonuses.
 - 5 eras × 3 enemies × 3 traps; 20 waves per era with Wave-20 repeat; resource drops; castle damage.
 - Castle Upgrade with health restore and full era swap (castle, scenery, Shop, enemies).
-- Speed button.
+- Speed button, pause button, sound effects + music with a mute button.
 - Win/Defeat Stats Screen.
 
 ## Deferred From the POC

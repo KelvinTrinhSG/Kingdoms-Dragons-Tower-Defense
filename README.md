@@ -15,7 +15,7 @@ Nothing to install, no account.
 5. Press **Upgrade** (above the castle) to evolve into the next era: the castle, scenery, traps, and enemies all change. Old traps are refunded, old enemies are cleared (you keep their drops), you get a bonus, and a countdown gives you 7 seconds to prepare.
 6. Survive **Wave 20 of the Modern era** to win. If you don't upgrade after Wave 20, it repeats.
 
-Use the **speed button** (top left) to play at 1×, 2×, or 4×.
+Use the **speed button** (top left) to play at 1×, 2×, or 4×. **Pause** with the ⏸ button, **P**, or **Esc**, and mute the sound with the speaker button.
 
 ## Eras
 
@@ -44,6 +44,7 @@ Testing shortcuts (URL parameters): `?era=3&wave=18&money=5000&res=999` starts a
 ## How it's built
 
 - **Phaser 4** draws the world: map, castle, enemies, traps. All art is drawn with code (Canvas 2D) at startup — there are no image files.
+- Sound effects and the background music loop are synthesized with the **Web Audio API** (`src/audio/sound.js`) — there are no audio files either.
 - **HTML/CSS** draws the interface (menu, HUD, shop, upgrade button, results screen) on top of the canvas.
 - The two layers talk through a small event bus (`src/bus.js`).
 - Game rules live in `src/logic/` as plain functions with unit tests in `tests/`; all numbers live in `src/data/`.

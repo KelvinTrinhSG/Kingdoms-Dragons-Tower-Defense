@@ -17,6 +17,28 @@ import { initStats } from './ui/stats.js';
 import { initShop } from './ui/shop.js';
 import { initPicker } from './ui/picker.js';
 import { initUpgrade } from './ui/upgrade.js';
+import { initPause } from './ui/pause.js';
+import { unlockAudio, playSfx, startMusic, stopMusic } from './audio/sound.js';
+
+// Sound hooks that don't belong to one screen: unlock on the first press, UI button clicks,
+// music for the length of a run, and the win/lose jingle.
+function initAudio(root) {
+  const unlock = () => unlockAudio();
+  document.addEventListener('pointerdown', unlock, true);
+  document.addEventListener('keydown', unlock, true);
+  root.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    // Trap picks have their own "place" sound.
+    if (btn && !btn.disabled && !btn.classList.contains('pick')) playSfx('click');
+  });
+  bus.on('scene:game', startMusic);
+  bus.on('scene:menu', stopMusic);
+  bus.on('game:paused', (paused) => (paused ? stopMusic() : startMusic()));
+  bus.on('game:over', ({ won }) => {
+    stopMusic();
+    playSfx(won ? 'win' : 'lose');
+  });
+}
 
 // Testing aid: ?era=3&wave=18&money=5000&res=999 starts a run at that point. Ignored when absent.
 function readDevShortcuts() {
@@ -46,6 +68,8 @@ async function start() {
   initUpgrade(root);
   initPicker(root);
   initStats(root);
+  initPause(root);
+  initAudio(root);
 
   const game = new Phaser.Game({
     type: Phaser.AUTO,
@@ -53,6 +77,7 @@ async function start() {
     width: WIDTH,
     height: HEIGHT,
     backgroundColor: '#0d1a33',
+    audio: { noAudio: true }, // sound is our own Web Audio synth (src/audio/sound.js)
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
     scene: [BootScene, MenuScene, GameScene],
   });

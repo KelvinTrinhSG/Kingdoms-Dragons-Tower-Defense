@@ -12,6 +12,7 @@ import { BALANCE } from '../data/balance.js';
 import { eraData, trapDef } from '../data/eras.js';
 import { popText, banner, FONT } from '../art/fx.js';
 import { ART_RES } from '../art/palette.js';
+import { playSfx } from '../audio/sound.js';
 
 const HP_BAR = { x: CASTLE_CENTER.x, y: 286, w: 120, h: 14 };
 
@@ -29,6 +30,10 @@ export class GameScene extends Phaser.Scene {
     this.state = createState(this.devOpts);
     this.time.timeScale = 1;
     this.tweens.timeScale = 1;
+    // A scene restarted from the pause menu must not stay frozen.
+    this.paused = false;
+    this.time.paused = false;
+    this.input.enabled = true;
     this.world = buildWorld(this, this.state.era);
     this.enemies = [];
     this.trapViews = new Map(); // trap id -> Trap sprite
@@ -44,19 +49,26 @@ export class GameScene extends Phaser.Scene {
     this.setupCellTaps();
     this.setupCountdown();
 
+    this.listen('ui:pause', () => this.setPaused(!this.paused));
     this.listen('ui:buyTrap', (id) => {
+      if (this.paused) return;
       if (buyTrap(this.state, id)) this.emitState();
     });
     this.listen('ui:placeTrap', ({ trapId, col, row }) => {
+      if (this.paused) return;
       const trap = buyAndPlaceTrap(this.state, trapId, col, row);
       this.selection.setVisible(false);
       if (!trap) return;
+      playSfx('place');
       this.trapViews.set(trap.id, new Trap(this, trap));
       this.emitState();
     });
     this.listen('ui:pickerClosed', () => this.selection.setVisible(false));
-    this.listen('ui:upgrade', () => this.upgrade());
+    this.listen('ui:upgrade', () => {
+      if (!this.paused) this.upgrade();
+    });
     this.listen('ui:speed', () => {
+      if (this.paused) return;
       // Cycle 1x -> 2x -> 4x -> 1x. Movement uses state.speed in update();
       // timers and tweens (pop-ups, flashes) follow through their time scales.
       const speeds = BALANCE.speeds;
@@ -79,6 +91,7 @@ export class GameScene extends Phaser.Scene {
   upgrade() {
     const result = applyUpgrade(this.state);
     if (!result) return;
+    playSfx('upgrade');
     this.enemies.filter((e) => !e.dead).forEach((e) => this.killEnemy(e));
     this.trapViews.forEach((v) => v.destroy());
     this.trapViews.clear();
@@ -99,6 +112,24 @@ export class GameScene extends Phaser.Scene {
     this.setupCountdown(eraData(result.era).name.toUpperCase() + '!');
     popText(this, CASTLE_CENTER.x, CASTLE_CENTER.y - 70, `+${result.refund + result.bonus}`, '#FFF04D', 26);
     this.emitState();
+  }
+
+  // Freeze everything: the frame loop, timers, tweens, and world input. Not allowed after game over.
+  setPaused(paused) {
+    if (paused === this.paused || (paused && this.state.over)) return;
+    this.paused = paused;
+    this.time.paused = paused;
+    if (paused) this.tweens.pauseAll();
+    else this.tweens.resumeAll();
+    this.input.enabled = !paused;
+    // Time spent paused doesn't count toward the run time on the Stats Screen.
+    if (paused) this.pausedAt = Date.now();
+    else this.state.startedAt += Date.now() - this.pausedAt;
+    if (paused) {
+      this.selection.setVisible(false);
+      bus.emit('cell:none');
+    }
+    bus.emit('game:paused', paused);
   }
 
   // Subscribe to a bus event for the lifetime of this scene.
@@ -122,6 +153,7 @@ export class GameScene extends Phaser.Scene {
       if (pointer.downElement !== this.game.canvas) return;
       const gained = clickCastle(this.state);
       if (!gained) return;
+      playSfx('coin');
       popText(this, pointer.worldX, pointer.worldY - 10, `+${gained}`);
       this.tweens.killTweensOf(castle);
       castle.setScale(base * 1.06, base * 0.94);
@@ -184,6 +216,7 @@ export class GameScene extends Phaser.Scene {
     const n = Math.max(1, Math.ceil(this.breakLeft));
     if (n === c.shown) return;
     c.shown = n;
+    playSfx('tick');
     c.timer.setText(`Enemies arrive in ${n}s`);
     c.timer.setScale(1.25);
     this.tweens.add({ targets: c.timer, scale: 1, duration: 250, ease: 'Back.easeOut' });
@@ -218,6 +251,7 @@ export class GameScene extends Phaser.Scene {
     this.waveMods = { hpMul: w.hpMul, speedMul: w.speedMul, rewardMul: w.rewardMul };
     this.waveClock = 0;
     this.phase = 'wave';
+    playSfx('wave');
     banner(this, this.state.waveRepeating ? `WAVE ${this.state.wave} AGAIN!` : `WAVE ${this.state.wave}`);
   }
 
@@ -248,6 +282,7 @@ export class GameScene extends Phaser.Scene {
     enemy.hitCells.add(trap.id);
     const { damage, usedUp, countered } = hitTrap(this.state, trap, enemy.role);
     const view = this.trapViews.get(trap.id);
+    playSfx('trap');
     view?.trigger();
     if (usedUp) {
       view?.destroy();
@@ -262,6 +297,7 @@ export class GameScene extends Phaser.Scene {
     const drop = killReward(eraData(enemy.era).enemies[enemy.role], enemy.rewardMul);
     addDrop(this.state, drop);
     this.state.kills += 1;
+    playSfx('kill');
     const parts = [];
     if (drop.stone) parts.push(`+${drop.stone} stone`);
     if (drop.wood) parts.push(`+${drop.wood} wood`);
@@ -278,6 +314,7 @@ export class GameScene extends Phaser.Scene {
   enemyReachedCastle(enemy) {
     enemy.destroy();
     const ended = castleHit(this.state, enemy.damage);
+    playSfx('castleHit');
     this.drawHpBar();
     const c = this.world.castle;
     this.tweens.add({ targets: c, x: { from: CASTLE_CENTER.x - 4, to: CASTLE_CENTER.x }, duration: 160, ease: 'Bounce.easeOut' });
@@ -301,7 +338,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(_time, delta) {
-    if (this.phase === 'over') return;
+    if (this.phase === 'over' || this.paused) return;
     const dt = (delta / 1000) * this.state.speed;
 
     if (this.phase === 'break') {

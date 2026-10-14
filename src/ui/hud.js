@@ -2,6 +2,7 @@ import { bus } from '../bus.js';
 import { eraData } from '../data/eras.js';
 import { BALANCE } from '../data/balance.js';
 import { ICONS } from './icons.js';
+import { isMuted, setMuted } from '../audio/sound.js';
 
 // Top-left: era and wave. Top-right: money, stone, wood, gold.
 export function initHud(root) {
@@ -14,6 +15,8 @@ export function initHud(root) {
         <svg viewBox="0 0 24 24" class="ff"><path d="M3 5l9 7-9 7zM12 5l9 7-9 7z" fill="currentColor"/></svg>
         <span data-el="speed">1×</span>
       </button>
+      <button class="btn btn-blue btn-small icon-btn" data-act="pause" title="Pause (P)" aria-label="Pause">${ICONS.pause}</button>
+      <button class="btn btn-blue btn-small icon-btn sound-btn" data-act="sound" title="Sound on/off" aria-label="Sound on/off"></button>
     </div>
     <div class="hud-tr">
       ${['money', 'stone', 'wood', 'gold']
@@ -30,6 +33,18 @@ export function initHud(root) {
   const last = {};
 
   speedBtn.addEventListener('click', () => bus.emit('ui:speed'));
+  el.querySelector('[data-act="pause"]').addEventListener('click', () => bus.emit('ui:pause'));
+
+  const soundBtn = el.querySelector('.sound-btn');
+  const drawSound = () => {
+    soundBtn.innerHTML = isMuted() ? ICONS.soundOff : ICONS.soundOn;
+    soundBtn.classList.toggle('muted', isMuted());
+  };
+  soundBtn.addEventListener('click', () => {
+    setMuted(!isMuted());
+    drawSound();
+  });
+  drawSound();
   bus.on('scene:game', () => el.classList.remove('hidden'));
   bus.on('scene:menu', () => el.classList.add('hidden'));
   bus.on('state:changed', (s) => {
