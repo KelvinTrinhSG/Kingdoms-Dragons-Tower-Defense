@@ -1,3 +1,9 @@
+import { bus } from '../bus.js';
+
+// Trap pictures come from the same code-drawn textures the map uses (filled in by BootScene).
+export const trapIcons = {};
+bus.on('art:ready', ({ trapIcons: urls }) => Object.assign(trapIcons, urls));
+
 // Small inline SVG icons for the HUD (no emoji, so they look the same everywhere).
 const O = '#2b1d12';
 

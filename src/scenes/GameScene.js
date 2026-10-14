@@ -1,13 +1,15 @@
 import * as Phaser from 'phaser';
 import { bus } from '../bus.js';
 import { buildWorld } from '../world/map.js';
-import { LANES, CASTLE_CENTER } from '../world/grid.js';
+import { LANES, CASTLE_CENTER, CELL, cellAt, cellCenter, isPathCell } from '../world/grid.js';
 import { Enemy } from '../world/Enemy.js';
+import { Trap } from '../world/Trap.js';
 import { createState, snapshot } from '../logic/state.js';
-import { clickCastle } from '../logic/economy.js';
-import { castleHit } from '../logic/combat.js';
+import { clickCastle, buyTrap, placeTrap, trapAt, addDrop } from '../logic/economy.js';
+import { castleHit, hitTrap } from '../logic/combat.js';
 import { buildWave, nextWave } from '../logic/waves.js';
 import { BALANCE } from '../data/balance.js';
+import { eraData, trapDef } from '../data/eras.js';
 import { popText, banner } from '../art/fx.js';
 import { ART_RES } from '../art/palette.js';
 
@@ -27,6 +29,7 @@ export class GameScene extends Phaser.Scene {
     this.state = createState(this.devOpts);
     this.world = buildWorld(this, this.state.era);
     this.enemies = [];
+    this.trapViews = new Map(); // trap id -> Trap sprite
     // Wave clock: 'break' counts down to the next wave, 'wave' releases spawns over time.
     this.phase = 'break';
     this.breakLeft = BALANCE.firstWaveDelay;
@@ -36,7 +39,19 @@ export class GameScene extends Phaser.Scene {
     this.setupCastle();
     this.hpBar = this.add.graphics().setDepth(5000);
     this.drawHpBar();
+    this.setupCellTaps();
 
+    this.listen('ui:buyTrap', (id) => {
+      if (buyTrap(this.state, id)) this.emitState();
+    });
+    this.listen('ui:placeTrap', ({ trapId, col, row }) => {
+      const trap = placeTrap(this.state, trapId, col, row);
+      this.selection.setVisible(false);
+      if (!trap) return;
+      this.trapViews.set(trap.id, new Trap(this, trap));
+      this.emitState();
+    });
+    this.listen('ui:pickerClosed', () => this.selection.setVisible(false));
     this.listen('ui:menu', () => this.scene.start('Menu'));
     this.listen('ui:restart', () => this.scene.restart());
     bus.emit('scene:game');
@@ -67,6 +82,34 @@ export class GameScene extends Phaser.Scene {
       castle.setScale(base * 1.06, base * 0.94);
       this.tweens.add({ targets: castle, scaleX: base, scaleY: base, duration: 180, ease: 'Back.easeOut' });
       this.emitState();
+    });
+  }
+
+  // Tapping a path cell opens the picker (or shows the trap already there). Other cells do nothing.
+  setupCellTaps() {
+    this.selection = this.add
+      .rectangle(0, 0, CELL - 4, CELL - 4)
+      .setStrokeStyle(3, 0xfff04d)
+      .setFillStyle(0xfff04d, 0.18)
+      .setDepth(4000)
+      .setVisible(false);
+    this.input.on('pointerdown', (pointer, over) => {
+      if (this.state.over || over.includes(this.world.castle)) return;
+      const cell = cellAt(pointer.worldX, pointer.worldY);
+      if (!cell || !isPathCell(cell.col, cell.row)) {
+        this.selection.setVisible(false);
+        bus.emit('cell:none');
+        return;
+      }
+      const { x, y } = cellCenter(cell.col, cell.row);
+      this.selection.setPosition(x, y).setVisible(true);
+      const trap = trapAt(this.state, cell.col, cell.row);
+      if (trap) {
+        const def = trapDef(trap.trapId);
+        bus.emit('cell:info', { ...cell, x, y, name: def.name, usesLeft: trap.usesLeft, uses: def.uses });
+      } else {
+        bus.emit('cell:tapped', { ...cell, x, y });
+      }
     });
   }
 
@@ -116,6 +159,41 @@ export class GameScene extends Phaser.Scene {
     this.emitState();
   }
 
+  // An enemy entering a trap's cell triggers it once.
+  checkTraps(enemy) {
+    const cell = enemy.cell();
+    if (!cell) return;
+    const trap = trapAt(this.state, cell.col, cell.row);
+    if (!trap || enemy.hitCells.has(trap.id)) return;
+    enemy.hitCells.add(trap.id);
+    const { damage, usedUp, countered } = hitTrap(this.state, trap, enemy.role);
+    const view = this.trapViews.get(trap.id);
+    view?.trigger();
+    if (usedUp) {
+      view?.destroy();
+      this.trapViews.delete(trap.id);
+    }
+    popText(this, enemy.x, enemy.y - 40, `-${damage}`, countered ? '#FF9E16' : '#FFFFFF', countered ? 22 : 16);
+    if (enemy.takeDamage(damage)) this.killEnemy(enemy);
+    this.emitState();
+  }
+
+  killEnemy(enemy) {
+    const drop = eraData(enemy.era).enemies[enemy.role].drop;
+    addDrop(this.state, drop);
+    this.state.kills += 1;
+    const parts = [];
+    if (drop.stone) parts.push(`+${drop.stone} stone`);
+    if (drop.wood) parts.push(`+${drop.wood} wood`);
+    if (drop.gold) parts.push(`+${drop.gold} gold`);
+    popText(this, enemy.x, enemy.y - 18, parts.join('  '), '#DDF7FF', 14);
+    const s = enemy.sprite;
+    enemy.dead = true;
+    enemy.barBg.destroy();
+    enemy.barFill.destroy();
+    this.tweens.add({ targets: s, alpha: 0, scaleY: 0, duration: 220, onComplete: () => s.destroy() });
+  }
+
   enemyReachedCastle(enemy) {
     enemy.destroy();
     const ended = castleHit(this.state, enemy.damage);
@@ -160,7 +238,9 @@ export class GameScene extends Phaser.Scene {
       if (e.update(dt)) {
         this.enemyReachedCastle(e);
         if (this.phase === 'over') break;
+        continue;
       }
+      this.checkTraps(e);
     }
     this.enemies = this.enemies.filter((e) => !e.dead);
 

@@ -4,6 +4,7 @@ export const BALANCE = {
   moneyPerClick: 5,
   wavesPerEra: 20,
   speeds: [1, 2, 4],
+  counterMultiplier: 3, // trap damage against the enemy type it counters
 
   // waves
   firstWaveDelay: 6, // seconds before Wave 1

@@ -1,5 +1,5 @@
 import { BALANCE } from '../data/balance.js';
-import { eraData } from '../data/eras.js';
+import { eraData, eraTrapIds } from '../data/eras.js';
 
 // A fresh run. `opts` carries dev shortcuts (era, wave, money, res) when present.
 export function createState(opts = {}, now = Date.now()) {
@@ -16,7 +16,7 @@ export function createState(opts = {}, now = Date.now()) {
     gold: res,
     castleHp: hp,
     castleMaxHp: hp,
-    inventory: {},
+    inventory: Object.fromEntries(eraTrapIds(era).map((id) => [id, 0])),
     traps: [],
     kills: 0,
     startedAt: now,

@@ -29,7 +29,7 @@ Build mode: fast
   Learner check: Press PLAY and don't defend. Watch enemies come from all four edges, see the castle's health bar shrink, and confirm the DEFEAT screen shows time, kills, and money. Try PLAY AGAIN.
   Commit: `Add 4-direction waves, castle damage, and defeat screen`
 
-- [ ] **3. Buy traps, place them on the paths, and kill enemies for resources**
+- [x] **3. Buy traps, place them on the paths, and kill enemies for resources**
   Becomes usable: The full Era 1 loop. The Shop (middle-left) sells the 3 Era 1 traps into the Inventory; tapping a path cell opens the trap picker; placed traps damage enemies (×3 vs their countered type), lose uses, and disappear at 0. Killed enemies drop stone/wood/gold shown in the HUD.
   Why now: Turns survival into a game you can win waves in, and creates the resources the upgrade slice needs. This is the first point the learner can judge feel and balance.
   PRD ref: `prd.md > The Core Journey` (steps 4–7), `prd.md > Shop and Inventory`, `prd.md > Placing Traps`, `prd.md > Traps in Action`, `prd.md > States and Boundaries` (empty Inventory, occupied cell, not enough money)

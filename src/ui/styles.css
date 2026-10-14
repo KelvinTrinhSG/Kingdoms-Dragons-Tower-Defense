@@ -276,6 +276,243 @@ body {
   background: var(--yellow);
 }
 
+.btn-small {
+  font-size: 0.85em;
+  padding: 0.45em 1em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.btn-small .icon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+/* ---------- Shop ---------- */
+.shop {
+  position: absolute;
+  left: 0.8em;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+}
+
+.shop-toggle {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 1.2em 0.65em;
+  font-size: 1.05em;
+  letter-spacing: 0.12em;
+}
+
+.shop-toggle:hover:not(:disabled) {
+  transform: rotate(180deg) translateY(2px);
+}
+
+.shop-panel {
+  width: 22em;
+  padding: 1em 1.1em 1.1em;
+  border-radius: 28px;
+}
+
+.shop-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shop-head h2 {
+  margin: 0;
+  font-size: 1.3em;
+}
+
+.close-x {
+  border: 0;
+  background: var(--inset);
+  color: var(--muted);
+  width: 1.8em;
+  height: 1.8em;
+  border-radius: 50%;
+  font-size: 1.1em;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+}
+
+.shop-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin: 0.7em 0;
+}
+
+.shop-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  background: var(--inset);
+  border-radius: 20px;
+  padding: 0.45em 0.6em;
+}
+
+.trap-img {
+  width: 2.8em;
+  height: 2.8em;
+  flex: none;
+}
+
+.shop-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.shop-name {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85em;
+}
+
+.shop-meta {
+  font-size: 0.72em;
+  color: var(--muted);
+}
+
+.shop-meta b {
+  color: #ff6b0a;
+}
+
+.shop-buy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15em;
+}
+
+.need {
+  font-size: 0.65em;
+  font-weight: 700;
+  color: var(--danger);
+  white-space: nowrap;
+}
+
+.inv {
+  border-top: 2px solid var(--line);
+  padding-top: 0.6em;
+}
+
+.inv-title {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  color: var(--muted);
+  margin-bottom: 0.4em;
+}
+
+.inv-list {
+  display: flex;
+  gap: 0.5em;
+}
+
+.inv-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.2em;
+  background: var(--inset);
+  border-radius: 32px;
+  padding: 0.2em 0.7em 0.2em 0.3em;
+  font-weight: 700;
+}
+
+.inv-chip img {
+  width: 2em;
+  height: 2em;
+}
+
+.inv-chip.empty {
+  opacity: 0.45;
+}
+
+.inv-hint {
+  font-size: 0.7em;
+  color: var(--muted);
+  margin-top: 0.5em;
+}
+
+/* ---------- Trap picker ---------- */
+.picker {
+  position: absolute;
+  padding: 0.5em;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4em;
+  animation: pop-in 0.18s ease-out;
+}
+
+.picker-row {
+  display: flex;
+  gap: 0.4em;
+}
+
+.pick {
+  position: relative;
+  border: 2px solid var(--line);
+  background: var(--inset);
+  border-radius: 18px;
+  width: 3.4em;
+  height: 3.4em;
+  padding: 0.2em;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.pick:hover {
+  transform: translateY(-2px);
+  border-color: #00a5ff;
+}
+
+.pick img {
+  width: 100%;
+  height: 100%;
+}
+
+.pick-count {
+  position: absolute;
+  right: -0.35em;
+  top: -0.35em;
+  background: var(--purple);
+  color: #fff;
+  border-radius: 32px;
+  font-size: 0.75em;
+  font-weight: 700;
+  padding: 0.1em 0.45em;
+}
+
+.picker-empty {
+  font-weight: 700;
+  font-size: 0.85em;
+  padding: 0.2em 0.6em 0;
+  white-space: nowrap;
+}
+
+.picker-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.2em 0.8em;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+.picker-info span {
+  color: var(--muted);
+  font-weight: 600;
+}
+
 /* ---------- Stats screen ---------- */
 .stats-card {
   width: min(38em, 92%);
