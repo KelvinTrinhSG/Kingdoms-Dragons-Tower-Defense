@@ -513,6 +513,79 @@ body {
   font-weight: 600;
 }
 
+/* ---------- Upgrade ---------- */
+.upgrade {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25em;
+}
+
+.upgrade-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2em;
+  padding: 0.4em 1em 0.45em;
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+
+.upgrade-btn:not(:disabled) {
+  animation: glow 1.4s ease-in-out infinite;
+}
+
+.up-title small {
+  font-size: 0.75em;
+  opacity: 0.85;
+}
+
+.costs {
+  display: flex;
+  gap: 0.5em;
+}
+
+.cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15em;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 32px;
+  padding: 0.05em 0.5em 0.05em 0.15em;
+}
+
+.cost .icon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.cost.short {
+  background: rgba(199, 20, 31, 0.85);
+}
+
+.need-line {
+  background: rgba(20, 31, 61, 0.82);
+  color: #fff;
+  font-size: 0.68em;
+  font-weight: 600;
+  border-radius: 32px;
+  padding: 0.2em 0.8em;
+  white-space: nowrap;
+}
+
+.max-era {
+  font-size: 0.8em;
+  background: var(--purple);
+}
+
+@keyframes glow {
+  50% {
+    box-shadow: 0 0 0 4px rgba(255, 240, 77, 0.8), var(--btn-shadow);
+  }
+}
+
 /* ---------- Stats screen ---------- */
 .stats-card {
   width: min(38em, 92%);

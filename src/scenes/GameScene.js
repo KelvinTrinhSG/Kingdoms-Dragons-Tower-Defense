@@ -5,7 +5,7 @@ import { LANES, CASTLE_CENTER, CELL, cellAt, cellCenter, isPathCell } from '../w
 import { Enemy } from '../world/Enemy.js';
 import { Trap } from '../world/Trap.js';
 import { createState, snapshot } from '../logic/state.js';
-import { clickCastle, buyTrap, placeTrap, trapAt, addDrop, killReward } from '../logic/economy.js';
+import { clickCastle, buyTrap, placeTrap, trapAt, addDrop, killReward, applyUpgrade } from '../logic/economy.js';
 import { castleHit, hitTrap } from '../logic/combat.js';
 import { buildWave, nextWave } from '../logic/waves.js';
 import { BALANCE } from '../data/balance.js';
@@ -52,9 +52,38 @@ export class GameScene extends Phaser.Scene {
       this.emitState();
     });
     this.listen('ui:pickerClosed', () => this.selection.setVisible(false));
+    this.listen('ui:upgrade', () => this.upgrade());
     this.listen('ui:menu', () => this.scene.start('Menu'));
     this.listen('ui:restart', () => this.scene.restart());
     bus.emit('scene:game');
+    // The Upgrade button sits just above the castle's health bar.
+    bus.emit('castle:moved', { x: HP_BAR.x, y: HP_BAR.y - HP_BAR.h - 18 });
+    this.emitState();
+  }
+
+  // Evolve the castle: old traps are cashed out, the world redraws in the new era,
+  // and the next wave is Wave 1 of that era. Enemies already walking keep going.
+  upgrade() {
+    const result = applyUpgrade(this.state);
+    if (!result) return;
+    this.trapViews.forEach((v) => v.destroy());
+    this.trapViews.clear();
+    this.selection.setVisible(false);
+    this.world.setEra(result.era);
+    this.drawHpBar();
+    // the current wave stops spawning; a short break, then Wave 1 of the new era
+    this.pending = [];
+    this.phase = 'break';
+    this.breakLeft = BALANCE.waveBreak + 1;
+
+    const castle = this.world.castle;
+    const base = 1 / ART_RES;
+    this.tweens.killTweensOf(castle);
+    castle.setScale(base * 0.6);
+    this.tweens.add({ targets: castle, scale: base, duration: 650, ease: 'Elastic.easeOut' });
+    this.cameras.main.flash(350, 255, 255, 255);
+    banner(this, eraData(result.era).name.toUpperCase() + '!', '#FFF04D');
+    popText(this, CASTLE_CENTER.x, CASTLE_CENTER.y - 70, `+${result.refund + result.bonus}`, '#FFF04D', 26);
     this.emitState();
   }
 

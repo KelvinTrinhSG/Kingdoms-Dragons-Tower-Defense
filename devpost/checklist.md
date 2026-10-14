@@ -39,7 +39,7 @@ Build mode: fast
   Learner check: Click the castle for money, open SHOP and buy a few traps, tap a path cell and place one. Watch an enemy step on it, take damage, and drop resources. Try tapping grass (nothing should happen) and an empty Inventory (picker should point you to the Shop).
   Commit: `Add shop, inventory, trap placement, and combat`
 
-- [ ] **4. Upgrade the castle and watch the whole world evolve through all 5 eras**
+- [x] **4. Upgrade the castle and watch the whole world evolve through all 5 eras**
   Becomes usable: The "oh, that's cool" moment. The Upgrade button above the health bar (disabled with missing amounts listed) evolves the castle; castle art, scenery, Shop traps, and enemies switch to the next era; old traps are refunded plus the era bonus; health refills; next wave is Wave 1. Wave 20 repeats without upgrading; "MAX ERA" in Era 5; clearing Era 5 Wave 20 shows the Victory screen. Dev shortcuts (`?era=&wave=&money=&res=`) work.
   Why now: The last and most visible kernel piece; it depends on slices 1–3. Building the remaining 4 eras' art and data here keeps all era content in one coherent step.
   PRD ref: `prd.md > The Core Journey` (steps 9–11), `prd.md > Castle Upgrade and Eras`, `prd.md > Era Roster`, `prd.md > Stats Screen` (win)

@@ -1,6 +1,6 @@
 ﻿import { describe, it, expect } from 'vitest';
 import { createState } from '../src/logic/state.js';
-import { clickCastle, buyTrap, placeTrap, addDrop, trapAt, killReward } from '../src/logic/economy.js';
+import { clickCastle, buyTrap, placeTrap, addDrop, trapAt, killReward, canUpgrade, missingForUpgrade, applyUpgrade, refundTraps, eraBonus, upgradeCost } from '../src/logic/economy.js';
 import { BALANCE } from '../src/data/balance.js';
 import { trapDef, ERAS } from '../src/data/eras.js';
 
@@ -108,5 +108,84 @@ describe('killReward', () => {
     expect(killReward(enemies.heavy, 1).money).toBeGreaterThan(killReward(enemies.standard, 1).money);
     expect(killReward(enemies.standard, 1).money).toBeGreaterThan(killReward(enemies.fast, 1).money);
     expect(killReward(enemies.fast, 2.5).money).toBeGreaterThan(killReward(enemies.fast, 1).money);
+  });
+});
+
+describe('castle upgrade', () => {
+  it('is blocked without enough resources and lists what is missing', () => {
+    const s = createState();
+    s.stone = 10;
+    expect(canUpgrade(s)).toBe(false);
+    const cost = ERAS[0].upgradeCost;
+    expect(missingForUpgrade(s)).toEqual({ stone: cost.stone - 10, wood: cost.wood, gold: cost.gold });
+    expect(applyUpgrade(s)).toBeNull();
+    expect(s.era).toBe(1);
+  });
+
+  it('moves to Wave 1 of the next era, refills health, and spends resources', () => {
+    const s = createState({ res: 999, wave: 14 });
+    s.castleHp = 3;
+    applyUpgrade(s);
+    const cost = ERAS[0].upgradeCost;
+    expect(s.era).toBe(2);
+    expect(s.wave).toBe(1);
+    expect(s.castleHp).toBe(ERAS[1].castleHp);
+    expect(s.castleMaxHp).toBe(ERAS[1].castleHp);
+    expect([s.stone, s.wood, s.gold]).toEqual([999 - cost.stone, 999 - cost.wood, 999 - cost.gold]);
+  });
+
+  it('cashes out every old trap (map and Inventory) plus the era bonus', () => {
+    const s = createState({ res: 999, money: 1000 });
+    buyTrap(s, 't1-mid');
+    buyTrap(s, 't1-mid');
+    buyTrap(s, 't1-expensive');
+    const placed = placeTrap(s, 't1-mid', 15, 2);
+    placed.usesLeft = 1; // 1 of 3 uses left
+    const moneyBefore = s.money;
+    const mid = trapDef('t1-mid');
+    const exp = trapDef('t1-expensive');
+    const expectedRefund = Math.floor(mid.price / 3) + mid.price + exp.price;
+    expect(refundTraps(s)).toBe(expectedRefund);
+    const r = applyUpgrade(s);
+    expect(r.refund).toBe(expectedRefund);
+    expect(s.money).toBe(moneyBefore + expectedRefund + eraBonus(2));
+    expect(s.traps).toHaveLength(0);
+    expect(Object.keys(s.inventory)).toEqual(['t2-cheap', 't2-mid', 't2-expensive']);
+    expect(Object.values(s.inventory).every((n) => n === 0)).toBe(true);
+  });
+
+  it('refunds are never negative', () => {
+    const s = createState({ money: 100 });
+    buyTrap(s, 't1-cheap');
+    const t = placeTrap(s, 't1-cheap', 15, 2);
+    t.usesLeft = 0;
+    expect(refundTraps(s)).toBeGreaterThanOrEqual(0);
+  });
+
+  it('the era bonus buys exactly 2 of the new era cheapest trap', () => {
+    for (let era = 2; era <= 5; era++) {
+      const cheapest = Math.min(...['cheap', 'mid', 'expensive'].map((t) => trapDef(`t${era}-${t}`).price));
+      expect(eraBonus(era)).toBe(cheapest * 2);
+      const s = createState({ era, money: eraBonus(era) });
+      expect(buyTrap(s, `t${era}-cheap`)).toBe(true);
+      expect(buyTrap(s, `t${era}-cheap`)).toBe(true);
+      expect(s.money).toBe(0);
+    }
+  });
+
+  it('has no upgrade beyond Era 5', () => {
+    const s = createState({ era: 5, res: 99999 });
+    expect(upgradeCost(s)).toBeNull();
+    expect(canUpgrade(s)).toBe(false);
+    expect(applyUpgrade(s)).toBeNull();
+  });
+
+  it('every era has 3 enemies and 3 priced traps with uses 1/3/5', () => {
+    ERAS.forEach((era) => {
+      expect(Object.keys(era.enemies)).toEqual(['fast', 'standard', 'heavy']);
+      const traps = ['cheap', 'mid', 'expensive'].map((t) => era.traps[t]);
+      expect(traps.map((t) => t.uses)).toEqual([1, 3, 5]);
+      expect(traps[0].price < traps[1].price && traps[1].price < traps[2].price).toBe(true);
+    });
   });
 });

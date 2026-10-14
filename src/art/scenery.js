@@ -68,6 +68,44 @@ function drawMap(ctx, era) {
     }
   }
 
+  // era-specific road surface
+  if (era === 3) {
+    // cobblestones
+    ctx.strokeStyle = shade(pal.path, -0.22);
+    ctx.lineWidth = 1.2;
+    for (let col = 0; col < COLS; col++) {
+      for (let row = 0; row < ROWS; row++) {
+        if (!isPathCell(col, row)) continue;
+        for (let k = 0; k < 4; k++) {
+          ellipse(ctx, col * CELL + 10 + (k % 2) * 20, row * CELL + 10 + Math.floor(k / 2) * 20, 8, 7);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+  if (era === 5) {
+    // dashed centre lines on the asphalt
+    ctx.strokeStyle = '#ffd23a';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([16, 14]);
+    Object.values(PATHS).forEach((p) => {
+      const x0 = p.c0 * CELL;
+      const y0 = p.r0 * CELL;
+      const x1 = (p.c1 + 1) * CELL;
+      const y1 = (p.r1 + 1) * CELL;
+      ctx.beginPath();
+      if (x1 - x0 < y1 - y0) {
+        ctx.moveTo((x0 + x1) / 2, y0);
+        ctx.lineTo((x0 + x1) / 2, y1);
+      } else {
+        ctx.moveTo(x0, (y0 + y1) / 2);
+        ctx.lineTo(x1, (y0 + y1) / 2);
+      }
+      ctx.stroke();
+    });
+    ctx.setLineDash([]);
+  }
+
   // grid: faint everywhere, clearer on the paths where traps go
   ctx.strokeStyle = 'rgba(43, 29, 18, 0.05)';
   ctx.lineWidth = 1;
@@ -172,7 +210,159 @@ const ERA_DECOR = {
   },
 };
 
-export const DECOR_SIZES = { tree: [80, 100], bush: [50, 40], rock: [56, 42], building: [70, 70] };
+// ---- shared decoration templates ----
+
+function roundTree(ctx, leaf, trunk = '#7a4a22', tall = 0) {
+  dropShadow(ctx, 40, 94, 26, 6);
+  ctx.beginPath();
+  ctx.roundRect(35, 58 - tall, 10, 36 + tall, 3);
+  paint(ctx, trunk, 58 - tall, 94, 2.5);
+  [[40, 38 - tall, 26], [24, 50 - tall, 17], [56, 50 - tall, 17]].forEach(([x, y, r]) => {
+    ellipse(ctx, x, y, r, r * 0.9);
+    paint(ctx, leaf, y - r, y + r, 3);
+  });
+  ellipse(ctx, 40, 44 - tall, 22, 16);
+  ctx.fillStyle = leaf;
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.18)';
+  ellipse(ctx, 32, 30 - tall, 9, 6);
+  ctx.fill();
+}
+
+function pineTree(ctx, leaf) {
+  dropShadow(ctx, 40, 94, 20, 5);
+  ctx.beginPath();
+  ctx.rect(36, 76, 8, 18);
+  paint(ctx, '#6b4423', 76, 94, 2.5);
+  [[80, 30], [62, 24], [44, 18]].forEach(([y, hw], i) => {
+    poly(ctx, [[40 - hw, y], [40, y - 30 + i * 2], [40 + hw, y]]);
+    paint(ctx, leaf, y - 30, y, 3);
+  });
+}
+
+function roundBush(ctx, leaf) {
+  dropShadow(ctx, 25, 35, 20, 4);
+  [[16, 26, 10], [34, 26, 10], [25, 20, 12]].forEach(([x, y, r]) => {
+    ellipse(ctx, x, y, r, r * 0.85);
+    paint(ctx, leaf, y - r, y + r, 2.5);
+  });
+}
+
+function stones(ctx, color) {
+  dropShadow(ctx, 28, 37, 25, 4);
+  [[18, 30, 12, 8], [34, 31, 10, 7], [27, 24, 9, 7]].forEach(([x, y, rx, ry]) => {
+    ellipse(ctx, x, y, rx, ry);
+    paint(ctx, color, y - ry, y + ry, 2.5);
+  });
+  shine(ctx, 22, 19, 29, 18, 2);
+}
+
+function hut(ctx, wall, roof, stone = false) {
+  dropShadow(ctx, 35, 64, 30, 6);
+  ctx.beginPath();
+  ctx.rect(12, 34, 46, 30);
+  paint(ctx, wall, 34, 64, 3);
+  ctx.strokeStyle = 'rgba(43,29,18,0.35)';
+  ctx.lineWidth = 1.5;
+  for (let y = 40; y < 64; y += 6) {
+    ctx.beginPath();
+    ctx.moveTo(13, y);
+    ctx.lineTo(57, y);
+    ctx.stroke();
+    if (stone) {
+      for (let x = 18 + ((y / 6) % 2) * 5; x < 57; x += 10) {
+        ctx.beginPath();
+        ctx.moveTo(x, y - 6);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+    }
+  }
+  poly(ctx, [[6, 36], [35, 10], [64, 36]]);
+  paint(ctx, roof, 10, 36, 3);
+  shine(ctx, 31, 16, 14, 32, 2.5, 0.3);
+  ctx.beginPath();
+  ctx.roundRect(29, 46, 12, 18, [6, 6, 0, 0]);
+  flat(ctx, '#3a2614', 2.5);
+}
+
+const ERA_DECOR_MORE = {
+  2: {
+    tree: (ctx) => roundTree(ctx, '#4f9a3a'),
+    bush: (ctx) => roundBush(ctx, '#5ea844'),
+    rock: (ctx) => stones(ctx, '#9a8f82'),
+    building: (ctx) => hut(ctx, '#a8743e', '#d9b45a'),
+  },
+  3: {
+    tree: (ctx) => pineTree(ctx, '#2f6b3a'),
+    bush: (ctx) => roundBush(ctx, '#3f7f3a'),
+    rock: (ctx) => stones(ctx, '#a9adb3'),
+    building: (ctx) => hut(ctx, '#b9ad97', '#b33a2a', true),
+  },
+  4: {
+    tree: (ctx) => roundTree(ctx, '#6f8a3a', '#6b4a2b', 6),
+    bush: (ctx) => roundBush(ctx, '#7a9440'),
+    rock(ctx) {
+      // a parked field cannon
+      dropShadow(ctx, 28, 37, 25, 4);
+      ctx.save();
+      ctx.translate(26, 30);
+      ctx.rotate(-0.25);
+      ctx.beginPath();
+      ctx.roundRect(-6, -6, 30, 10, 5);
+      paint(ctx, '#2f3338', -6, 4, 2.5);
+      ctx.restore();
+      ellipse(ctx, 22, 31, 8, 8);
+      flat(ctx, '#8b5a2b', 2.5);
+      ellipse(ctx, 22, 31, 2.5, 2.5);
+      flat(ctx, '#3a2614', 1.5);
+    },
+    building(ctx) {
+      // canvas army tent
+      dropShadow(ctx, 35, 64, 30, 6);
+      poly(ctx, [[6, 64], [20, 26], [50, 26], [64, 64]]);
+      paint(ctx, '#d8cfae', 26, 64, 3);
+      poly(ctx, [[20, 26], [35, 64], [6, 64]]);
+      paint(ctx, '#c2b68e', 26, 64, 2.5);
+      poly(ctx, [[30, 64], [35, 40], [40, 64]]);
+      flat(ctx, '#3a2614', 2.5);
+      ctx.beginPath();
+      ctx.rect(33.5, 14, 3, 14);
+      flat(ctx, '#5a3418', 2);
+    },
+  },
+  5: {
+    tree: (ctx) => roundTree(ctx, '#3d6e33', '#55483a'),
+    bush: (ctx) => roundBush(ctx, '#4a7a3a'),
+    rock(ctx) {
+      // sandbag pile
+      dropShadow(ctx, 28, 37, 26, 4);
+      [[12, 32], [28, 32], [44, 32], [20, 23], [36, 23], [28, 14]].forEach(([x, y]) => {
+        ellipse(ctx, x, y, 9, 5.5);
+        paint(ctx, '#c2b280', y - 6, y + 6, 2);
+      });
+    },
+    building(ctx) {
+      // concrete bunker
+      dropShadow(ctx, 35, 64, 32, 6);
+      ctx.beginPath();
+      ctx.roundRect(6, 28, 58, 36, [18, 18, 4, 4]);
+      paint(ctx, '#8a9099', 28, 64, 3);
+      ctx.beginPath();
+      ctx.rect(18, 40, 34, 7);
+      flat(ctx, '#1f2937', 2.5);
+      ctx.beginPath();
+      ctx.rect(30, 14, 3, 16);
+      flat(ctx, '#4b5563', 2);
+      poly(ctx, [[33, 15], [46, 19], [33, 23]]);
+      paint(ctx, '#35ec00', 15, 23, 2);
+    },
+  },
+};
+
+Object.assign(ERA_DECOR, ERA_DECOR_MORE);
+
+export const DECOR_SIZES ={ tree: [80, 100], bush: [50, 40], rock: [56, 42], building: [70, 70] };
 
 export function makeEraTextures(scene, era) {
   makeTexture(scene, `map-${era}`, WIDTH, HEIGHT, (ctx) => drawMap(ctx, era));
