@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>App Map — Kingdoms &amp; Dragons Tower Defense</title>
+<style>
+  :root { --text:#141F3D; --muted:#406394; --inset:#EAF9FF; --line:#DCEBF4; --blue:#1259E0; --orange:#FF6B0A; --green:#1f9e00; --purple:#5636D5; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Fredoka, Inter, ui-rounded, system-ui, sans-serif; color:var(--text); background:#f4fbff; line-height:1.55; }
+  main { max-width: 920px; margin: 0 auto; padding: 32px 20px 60px; }
+  h1 { font-size: 2rem; margin: 0 0 4px; text-transform: uppercase; letter-spacing: .02em; }
+  h2 { font-size: 1.15rem; text-transform: uppercase; letter-spacing: .04em; margin: 34px 0 10px; color: var(--blue); }
+  .sub { color: var(--muted); margin: 0 0 18px; }
+  .card { background:#fff; border-radius: 24px; padding: 18px 22px; box-shadow: 0 10px 26px rgba(0,46,89,.10); margin: 12px 0; }
+  .layers { display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .layers .card { margin: 0; }
+  .tag { display:inline-block; font-size:.75rem; font-weight:700; text-transform:uppercase; padding:2px 10px; border-radius:20px; color:#fff; }
+  .t-world { background: var(--green); } .t-ui { background: var(--blue); } .t-logic { background: var(--purple); } .t-bus { background: var(--orange); }
+  code { background: var(--inset); border: 1px solid var(--line); border-radius: 8px; padding: 1px 6px; font-size: .9em; }
+  ol.route { padding-left: 0; list-style: none; counter-reset: s; }
+  ol.route > li { counter-increment: s; position: relative; padding-left: 52px; }
+  ol.route > li::before { content: counter(s); position:absolute; left: 18px; top: 18px; width: 26px; height: 26px; border-radius: 50%; background: var(--blue); color:#fff; font-weight:700; text-align:center; line-height:26px; }
+  table { width:100%; border-collapse: collapse; }
+  td, th { text-align:left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-size: .8rem; text-transform: uppercase; }
+  details { margin-top: 8px; } summary { cursor: pointer; color: var(--muted); font-weight: 600; }
+  a { color: var(--blue); }
+  svg text { font-family: inherit; }
+  .small { font-size: .85rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Kingdoms &amp; Dragons — App Map</h1>
+  <p class="sub">A take-home guide to where things live in the code. Snapshot of commit <code>c959294</code> on <code>main</code>; the code may drift after this.</p>
+
+  <h2>What the app is</h2>
+  <div class="card">
+    A browser tower defense + clicker game: click the central castle for money, buy traps, place them on 4 paths, and upgrade the castle through 5 eras.
+    It is one web page with no server. Two layers sit on top of each other and talk through one messenger:
+  </div>
+  <div class="layers">
+    <div class="card"><span class="tag t-world">World · Phaser 4</span><p>Map, castle, enemies, traps, waves. <code>src/scenes/</code>, <code>src/world/</code>, art drawn with code in <code>src/art/</code>.</p></div>
+    <div class="card"><span class="tag t-ui">Interface · HTML/CSS</span><p>Menu, HUD, Shop, picker, Upgrade button, results. <code>src/ui/</code>.</p></div>
+    <div class="card"><span class="tag t-logic">Rules · plain JS</span><p>Money, traps, damage, waves, upgrades — no Phaser, unit-tested. <code>src/logic/</code>, numbers in <code>src/data/</code>, tests in <code>tests/</code>.</p></div>
+    <div class="card"><span class="tag t-bus">Event bus</span><p><code>src/bus.js</code>: the world says "state changed"; the interface says "buy this trap".</p></div>
+  </div>
+
+  <h2>One action, end to end: clicking the castle</h2>
+  <div class="card">
+    <svg viewBox="0 0 860 170" width="100%" role="img" aria-labelledby="flowTitle">
+      <title id="flowTitle">Click on castle flows through GameScene, economy rules, the event bus, and the HUD money counter.</title>
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#406394"/></marker></defs>
+      <g font-size="13">
+        <rect x="5" y="45" width="140" height="70" rx="18" fill="#EAF9FF" stroke="#DCEBF4" stroke-width="2"/>
+        <text x="75" y="75" text-anchor="middle" font-weight="700">Player clicks</text><text x="75" y="95" text-anchor="middle">the castle</text>
+        <rect x="180" y="45" width="160" height="70" rx="18" fill="#e9f8e4" stroke="#1f9e00" stroke-width="2"/>
+        <text x="260" y="72" text-anchor="middle" font-weight="700">GameScene</text><text x="260" y="92" text-anchor="middle">pointerdown on castle</text>
+        <rect x="375" y="45" width="150" height="70" rx="18" fill="#efeafd" stroke="#5636D5" stroke-width="2"/>
+        <text x="450" y="72" text-anchor="middle" font-weight="700">economy.js</text><text x="450" y="92" text-anchor="middle">clickCastle(state)</text>
+        <rect x="560" y="45" width="130" height="70" rx="18" fill="#fff1e6" stroke="#FF6B0A" stroke-width="2"/>
+        <text x="625" y="72" text-anchor="middle" font-weight="700">bus</text><text x="625" y="92" text-anchor="middle">state:changed</text>
+        <rect x="725" y="45" width="130" height="70" rx="18" fill="#e6efff" stroke="#1259E0" stroke-width="2"/>
+        <text x="790" y="72" text-anchor="middle" font-weight="700">hud.js</text><text x="790" y="92" text-anchor="middle">money pill +5</text>
+        <g stroke="#406394" stroke-width="2" marker-end="url(#ar)"><line x1="145" y1="80" x2="178" y2="80"/><line x1="340" y1="80" x2="373" y2="80"/><line x1="525" y1="80" x2="558" y2="80"/><line x1="690" y1="80" x2="723" y2="80"/></g>
+        <text x="260" y="140" text-anchor="middle" fill="#406394">also: "+5" pop-up, squash tween</text>
+      </g>
+    </svg>
+  </div>
+
+  <p class="small">Reference route — follow it in your editor (search for the anchor text):</p>
+  <ol class="route">
+    <li class="card"><b><code>src/scenes/GameScene.js</code> → <code>setupCastle()</code></b><br>
+      Phaser input: the castle image gets <code>setInteractive</code> with a round hit area, and <code>castle.on('pointerdown', …)</code> runs on every click. It calls the rule, shows <code>popText</code>, plays a squash tween, then <code>emitState()</code>.</li>
+    <li class="card"><b><code>src/logic/economy.js</code> → <code>clickCastle(state)</code></b><br>
+      The rule itself: adds the current era's <code>clickMoney</code> (from <code>src/data/eras.js</code>). No Phaser here, so <code>tests/economy.test.js</code> can check it directly.</li>
+    <li class="card"><b><code>src/ui/hud.js</code> → <code>bus.on('state:changed'</code></b><br>
+      The interface hears the new state snapshot and updates the money pill (with a small bump animation). The HUD never touches Phaser; it only listens.</li>
+  </ol>
+
+  <h2>Phaser concepts used here</h2>
+  <div class="card">
+    <table>
+      <tr><th>Concept</th><th>Where</th><th>Docs</th></tr>
+      <tr><td>Scenes (Boot → Menu → Game)</td><td><code>src/scenes/BootScene.js</code>, <code>MenuScene.js</code>, <code>GameScene.js</code>; <code>this.scene.start('Game')</code></td><td><a href="https://docs.phaser.io/phaser/concepts/scenes">Scenes</a></td></tr>
+      <tr><td>Textures drawn with code</td><td><code>src/art/palette.js</code> → <code>makeTexture</code> (<code>textures.createCanvas</code> + Canvas 2D, drawn at 2× for sharpness)</td><td><a href="https://docs.phaser.io/phaser/concepts/textures">Textures</a></td></tr>
+      <tr><td>Update loop</td><td><code>GameScene.update(_time, delta)</code> moves enemies, spawns waves, checks traps; <code>Enemy.update(dt)</code> walks waypoints</td><td><a href="https://docs.phaser.io/phaser/concepts/scenes">Scene lifecycle</a></td></tr>
+      <tr><td>Input</td><td><code>setupCastle()</code> (object input) and <code>setupCellTaps()</code> → <code>this.input.on('pointerdown'</code> (grid taps)</td><td><a href="https://docs.phaser.io/phaser/concepts/input">Input</a></td></tr>
+      <tr><td>Time scale (speed button)</td><td><code>ui:speed</code> listener in <code>GameScene.create()</code>: <code>state.speed</code> + <code>this.time.timeScale</code> + <code>this.tweens.timeScale</code></td><td><a href="https://docs.phaser.io/phaser/concepts/time">Time</a> · <a href="https://docs.phaser.io/phaser/concepts/tweens">Tweens</a></td></tr>
+      <tr><td>Tint (hit flash)</td><td><code>src/world/Enemy.js</code> → <code>takeDamage</code>: Phaser 4 uses <code>setTint(c).setTintMode(Phaser.TintModes.FILL)</code>; <code>setTintFill</code> was removed</td><td><a href="https://docs.phaser.io">docs.phaser.io</a></td></tr>
+    </table>
+  </div>
+
+  <h2>To change this, start here</h2>
+  <div class="card">
+    <table>
+      <tr><th>I want to change…</th><th>Start here</th></tr>
+      <tr><td>Prices, damage, enemy health/speed, upgrade costs, click money</td><td><code>src/data/eras.js</code></td></tr>
+      <tr><td>Wave size, difficulty ramp, wave breaks, speed levels</td><td><code>src/data/balance.js</code>, <code>src/logic/waves.js</code> → <code>buildWave</code></td></tr>
+      <tr><td>How a castle / enemy / trap / tree looks</td><td><code>src/art/castle.js</code>, <code>enemy.js</code>, <code>trap.js</code>, <code>scenery.js</code> (one function per era)</td></tr>
+      <tr><td>What happens when an enemy steps on a trap</td><td><code>GameScene.checkTraps(enemy)</code> + <code>src/logic/combat.js</code> → <code>hitTrap</code></td></tr>
+      <tr><td>Interface look (colors, buttons, cards)</td><td><code>src/ui/styles.css</code> (CSS variables at the top)</td></tr>
+      <tr><td>Map layout, paths, castle position</td><td><code>src/world/grid.js</code></td></tr>
+    </table>
+  </div>
+
+  <h2>A practice to reuse</h2>
+  <div class="card">
+    <p><b>Keep the rules out of the engine and check them with small tests.</b> In this build, all money, trap, wave, and upgrade rules live in <code>src/logic/</code> as plain functions, tested in <code>tests/*.test.js</code> (33 tests). When the difficulty ramp changed after your first checkpoint, the test <code>attacks from all 4 directions</code> failed immediately: Wave 1 now had only 3 enemies. That failure showed the rule had changed rather than broken, so only the test's expectation needed updating — found in seconds, without playing a single wave.</p>
+    <p>On your next Phaser project: put game rules in plain modules, let scenes call them, and test the rules directly. Then use a quick scripted playthrough (like the 4× bot used for balancing here) for the parts tests can't judge — pacing and feel.</p>
+  </div>
+
+  <h2>Run it again</h2>
+  <div class="card">
+    <code>npm install</code> → <code>npm run dev</code> (http://localhost:5173) · <code>npm test</code> · <code>npm run build</code> · <code>npm run preview</code><br>
+    Live: <a href="https://kelvintrinhsg.github.io/Kingdoms-Dragons-Tower-Defense/">kelvintrinhsg.github.io/Kingdoms-Dragons-Tower-Defense</a>
+    <details><summary>Testing shortcuts</summary><p><code>?era=3&amp;wave=18&amp;money=5000&amp;res=999</code> starts a run at that era/wave with that money and stone/wood/gold.</p></details>
+  </div>
+</main>
+</body>
+</html>

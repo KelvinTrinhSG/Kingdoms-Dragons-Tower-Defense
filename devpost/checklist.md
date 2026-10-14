@@ -73,23 +73,25 @@ Build mode: fast
 
 - [x] Early usable behavior explored — after slice 3 (full Era 1 loop: click, buy, place, kill, lose), before the 5-era content is built
   Feedback: kills should also give money; difficulty should ramp from few/slow/low-health enemies to many/fast/tanky ones; tougher enemies should pay more. Done: per-enemy base money × wave toughness, Wave 1 = 3 slow weak enemies, count/health/speed grow every wave (Wave 20 ≈ 24 enemies, ×2.5 health, ×1.6 speed). Verified with unit tests and in the browser.
-- [ ] Final kick-the-tires exploration and feedback completed
+- [x] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
 
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+Learner tried the live build and asked for no changes ("quá tuyệt vời rồi" — it's great as is). No revisions needed. Balance stays as tuned in slice 5 (Eras 1–4 easier, Era 5 hard), per the learner's easy-to-hard request.
+
+- [x] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
 
 - [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
 - [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: [what actually happened; real document/test/code references; unfinished work if interrupted]
-Route and stops: [actual paths and symbols; guided stops completed, or reference-only route]
-Edit outcome: [tried/kept/reverted/declined/not applicable; verification if changed]
-Reflection: [offered/answered/declined/already covered — personal answer belongs only in the ignored profile]
-Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
+Activity and evidence: Guided route offered, tied to the goal of understanding Phaser: follow one castle click through Phaser input, the pure rule, and the HTML HUD. Not yet completed. Map checked offline (renders, no console errors; Phaser docs links return 200) from commit `c959294`.
+Route and stops: reference route in the map — `src/scenes/GameScene.js` `setupCastle()` → `src/logic/economy.js` `clickCastle(state)` → `src/ui/hud.js` `bus.on('state:changed'`.
+Edit outcome: optional edit offered (Era 1 `clickMoney` in `src/data/eras.js`); pending.
+Reflection: not yet offered.
+Activity mode: live app and editor (pending).
 
 ## Revisions
 
