@@ -5,7 +5,7 @@ import { LANES, CASTLE_CENTER, CELL, cellAt, cellCenter, isPathCell } from '../w
 import { Enemy } from '../world/Enemy.js';
 import { Trap } from '../world/Trap.js';
 import { createState, snapshot } from '../logic/state.js';
-import { clickCastle, buyTrap, placeTrap, trapAt, addDrop } from '../logic/economy.js';
+import { clickCastle, buyTrap, placeTrap, trapAt, addDrop, killReward } from '../logic/economy.js';
 import { castleHit, hitTrap } from '../logic/combat.js';
 import { buildWave, nextWave } from '../logic/waves.js';
 import { BALANCE } from '../data/balance.js';
@@ -135,7 +135,7 @@ export class GameScene extends Phaser.Scene {
   startWave() {
     const w = buildWave(this.state.era, this.state.wave);
     this.pending = w.spawns;
-    this.hpMul = w.hpMul;
+    this.waveMods = { hpMul: w.hpMul, speedMul: w.speedMul, rewardMul: w.rewardMul };
     this.waveClock = 0;
     this.phase = 'wave';
     banner(this, this.state.waveRepeating ? `WAVE ${this.state.wave} AGAIN!` : `WAVE ${this.state.wave}`);
@@ -143,7 +143,7 @@ export class GameScene extends Phaser.Scene {
 
   spawn(s) {
     const lane = LANES.find((l) => l.dir === s.dir && l.lane === s.lane);
-    this.enemies.push(new Enemy(this, this.state.era, s.role, lane, this.hpMul));
+    this.enemies.push(new Enemy(this, this.state.era, s.role, lane, this.waveMods));
   }
 
   finishWave() {
@@ -179,14 +179,15 @@ export class GameScene extends Phaser.Scene {
   }
 
   killEnemy(enemy) {
-    const drop = eraData(enemy.era).enemies[enemy.role].drop;
+    const drop = killReward(eraData(enemy.era).enemies[enemy.role], enemy.rewardMul);
     addDrop(this.state, drop);
     this.state.kills += 1;
     const parts = [];
     if (drop.stone) parts.push(`+${drop.stone} stone`);
     if (drop.wood) parts.push(`+${drop.wood} wood`);
     if (drop.gold) parts.push(`+${drop.gold} gold`);
-    popText(this, enemy.x, enemy.y - 18, parts.join('  '), '#DDF7FF', 14);
+    popText(this, enemy.x, enemy.y - 34, `+${drop.money}`, '#FFF04D', 20);
+    popText(this, enemy.x, enemy.y - 14, parts.join('  '), '#DDF7FF', 14);
     const s = enemy.sprite;
     enemy.dead = true;
     enemy.barBg.destroy();

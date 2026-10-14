@@ -37,7 +37,15 @@ export function buildWave(era, wave, rand = Math.random) {
     lane: rand() < 0.5 ? 0 : 1,
     delay: i * interval,
   }));
-  return { era, wave, spawns, hpMul: 1 + (wave - 1) * BALANCE.hpGrowth };
+  const hpMul = 1 + (wave - 1) * BALANCE.hpGrowth;
+  return {
+    era,
+    wave,
+    spawns,
+    hpMul,
+    speedMul: 1 + (wave - 1) * BALANCE.speedGrowth,
+    rewardMul: hpMul,
+  };
 }
 
 // What comes after a cleared wave.

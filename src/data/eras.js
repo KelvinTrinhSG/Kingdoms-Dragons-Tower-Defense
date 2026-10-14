@@ -1,6 +1,6 @@
 // The 5 eras. Names follow prd.md > Era Roster.
 // Enemy speed is in pixels per second; damage is what it does to the castle on arrival;
-// drop is what a kill gives. Each trap counters one enemy role (cheap->fast, mid->standard, expensive->heavy).
+// money + drop is what a kill gives (money grows with the wave's toughness). Each trap counters one enemy role (cheap->fast, mid->standard, expensive->heavy).
 export const TIERS = ['cheap', 'mid', 'expensive'];
 
 export const ERAS = [
@@ -9,9 +9,9 @@ export const ERAS = [
     name: 'Prehistoric Cave',
     castleHp: 100,
     enemies: {
-      fast: { name: 'Cave runner', hp: 14, speed: 62, damage: 4, drop: { stone: 1, wood: 2, gold: 0 } },
-      standard: { name: 'Club brute', hp: 34, speed: 42, damage: 8, drop: { stone: 2, wood: 2, gold: 1 } },
-      heavy: { name: 'Mammoth rider', hp: 95, speed: 28, damage: 20, drop: { stone: 5, wood: 4, gold: 3 } },
+      fast: { name: 'Cave runner', hp: 10, speed: 46, damage: 4, money: 2, drop: { stone: 1, wood: 2, gold: 0 } },
+      standard: { name: 'Club brute', hp: 26, speed: 32, damage: 8, money: 4, drop: { stone: 2, wood: 2, gold: 1 } },
+      heavy: { name: 'Mammoth rider', hp: 80, speed: 22, damage: 20, money: 10, drop: { stone: 5, wood: 4, gold: 3 } },
     },
     traps: {
       cheap: { name: 'Sharpened stakes', price: 10, uses: 1, damage: 14, counters: 'fast' },

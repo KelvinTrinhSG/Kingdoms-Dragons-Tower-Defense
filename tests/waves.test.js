@@ -13,8 +13,10 @@ describe('buildWave', () => {
 
   it('attacks from all 4 directions', () => {
     for (let w = 1; w <= 20; w++) {
-      const dirs = new Set(buildWave(1, w, rng(w * 7)).spawns.map((s) => s.dir));
-      expect([...dirs].sort()).toEqual(['E', 'N', 'S', 'W']);
+      const { spawns } = buildWave(1, w, rng(w * 7));
+      const dirs = new Set(spawns.map((s) => s.dir));
+      // small early waves: every enemy from a different side; 4+ enemies: all sides
+      expect(dirs.size).toBe(Math.min(4, spawns.length));
     }
   });
 
@@ -43,5 +45,19 @@ describe('nextWave', () => {
   });
   it('wins after Wave 20 of Era 5', () => {
     expect(nextWave({ era: 5, wave: last }).won).toBe(true);
+  });
+});
+
+describe('difficulty ramp', () => {
+  it('starts with few, slow, weak enemies and gets more, faster, tankier', () => {
+    const w1 = buildWave(1, 1, rng(1));
+    const w20 = buildWave(1, 20, rng(1));
+    expect(w1.spawns.length).toBeLessThanOrEqual(3);
+    expect(w20.spawns.length).toBeGreaterThan(w1.spawns.length * 5);
+    expect(w1.hpMul).toBe(1);
+    expect(w1.speedMul).toBe(1);
+    expect(w20.hpMul).toBeGreaterThan(2);
+    expect(w20.speedMul).toBeGreaterThan(1.4);
+    expect(w20.rewardMul).toBeGreaterThan(w1.rewardMul);
   });
 });

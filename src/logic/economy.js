@@ -40,8 +40,14 @@ export function placeTrap(state, id, col, row) {
   return trap;
 }
 
-// A killed enemy's stone/wood/gold.
+// What killing an enemy gives: its stone/wood/gold plus money scaled by the wave's toughness.
+export function killReward(enemyDef, rewardMul = 1) {
+  return { money: Math.round(enemyDef.money * rewardMul), ...enemyDef.drop };
+}
+
+// Add a kill's money and stone/wood/gold.
 export function addDrop(state, drop) {
+  state.money += drop.money ?? 0;
   state.stone += drop.stone;
   state.wood += drop.wood;
   state.gold += drop.gold;

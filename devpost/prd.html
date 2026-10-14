@@ -181,7 +181,7 @@
     ["Shop","The player opens the Shop (middle-left button), buys this era's traps, and they go into the Inventory."],
     ["Placing traps","The player taps a path cell; a picker shows Inventory traps with counts; tapping one places it."],
     ["Waves","Waves start automatically. Enemies walk the 4 paths. Stepping on a trap damages the enemy and uses 1 of the trap's uses."],
-    ["Drops","Killed enemies drop stone, wood, and gold."],
+    ["Drops","Killed enemies drop stone, wood, and gold, plus money — more for tougher enemies and later waves."],
     ["Castle hit","Enemies that reach the castle damage it and disappear."],
     ["Upgrade","With enough resources, Upgrade (above the health bar) works any time: new era castle, scenery, Shop traps, health restored, next wave = Wave 1 of the new era. Old-era traps (map + Inventory) disappear and are refunded as money, plus a bonus worth 2 of the new era's cheapest trap."],
     ["Stuck era","Finish Wave 20 without upgrading → Wave 20 of that era repeats until the player upgrades."],
@@ -200,7 +200,7 @@
 
   const hot = {
     wave:"Top-left: current era and wave (e.g., Wave 7/20), plus the speed button (assumed 1× → 2× → 4×).",
-    res:"Top-right: money (from clicking the castle) and stone, wood, gold (dropped by enemies).",
+    res:"Top-right: money (from clicking the castle and kills) and stone, wood, gold (dropped by enemies).",
     shop:"Middle-left Shop button: opens the Shop (buy this era's 3 traps; no selling) and shows the Inventory with counts.",
     up:"Upgrade button above the health bar: usable any time you can afford it; disabled and shows what's missing otherwise; 'Max era' in Era 5.",
     hp:"Castle health bar, above the castle. Enemies reaching the castle lower it. Upgrading refills it. 0 = Defeat.",
@@ -221,7 +221,7 @@
       ["Choosing a trap places it on the cell and lowers its count.","Tapping a non-path cell does nothing."]],
     ["💥 Traps in Action","Stepping on a trap damages the enemy and uses 1 use; 0 uses → trap disappears. Counter traps hit everyone, but hit their type harder.",
       ["Enemy loses health and the trap's uses drop by 1.","Countered type takes visibly more damage.","A 1-use trap disappears after one step."]],
-    ["👹 Waves and Enemies","Waves auto-start; enemies come from all 4 directions. 3 enemy types per era, 20 waves per era. Kills drop stone/wood/gold. Reaching the castle = damage, then vanish.",
+    ["👹 Waves and Enemies","Waves auto-start; enemies come from all 4 directions. 3 enemy types per era, 20 waves per era. Waves ramp from few/slow/weak to many/fast/tanky. Kills drop stone/wood/gold plus money. Reaching the castle = damage, then vanish.",
       ["Enemies appear from all 4 edges and walk to the castle.","Kills increase stone/wood/gold.","An enemy at the castle lowers health and vanishes."]],
     ["⏩ Speed Button","Speeds up the game so a full run fits a demo.",["Pressing it visibly speeds up enemies, spawns, and waves; pressing again changes speed back."]],
     ["⬆️ Castle Upgrade and Eras","Usable any time resources allow. Spends resources; new castle art; health restored; new scenery; Shop switches eras; next wave = Wave 1 of the new era. Old-era traps (map + Inventory) disappear and are refunded as money; bonus money = 2 of the new era's cheapest trap. Era 5 is the last.",

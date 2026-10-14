@@ -71,7 +71,8 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 3 (full Era 1 loop: click, buy, place, kill, lose), before the 5-era content is built
+- [x] Early usable behavior explored — after slice 3 (full Era 1 loop: click, buy, place, kill, lose), before the 5-era content is built
+  Feedback: kills should also give money; difficulty should ramp from few/slow/low-health enemies to many/fast/tanky ones; tougher enemies should pay more. Done: per-enemy base money × wave toughness, Wave 1 = 3 slow weak enemies, count/health/speed grow every wave (Wave 20 ≈ 24 enemies, ×2.5 health, ×1.6 speed). Verified with unit tests and in the browser.
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
@@ -93,5 +94,6 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 ## Revisions
 
 - Art is drawn with the Canvas 2D API into Phaser canvas textures (`textures.createCanvas`) at 2x resolution instead of `Graphics.generateTexture` — Phaser 4.2.1's `generateTexture` renders through the Canvas renderer and drops gradients, which the Kingdom Rush look needs. Helpers live in `src/art/palette.js`; a shared `src/world/map.js` places ground, scenery, and castle for both Menu and Game scenes, and `src/ui/layout.js` keeps the HTML overlay aligned with the scaled canvas.
+- Killed enemies now drop money as well as stone/wood/gold, scaled by enemy type and wave toughness, and waves ramp in count, health, and speed — learner feedback at the early checkpoint; `prd.md` (Core Journey step 7, Waves and Enemies, Product Decisions) and `spec.md` (Core Journey, Economy Rules, Wave Manager, Game Data) updated to match. Slices 4–5 build on this: eras 2–5 enemies need a `money` value, and the slice 5 balance pass tunes these numbers.
 - The How to Play panel was built in slice 1 alongside the Main Menu (it was planned for slice 5) — it is a few lines in `menu.js` and avoided shipping a dead button.
 

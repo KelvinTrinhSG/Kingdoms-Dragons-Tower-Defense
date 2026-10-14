@@ -6,14 +6,16 @@ import { cellAt } from './grid.js';
 
 // One walking enemy: a sprite following its lane's waypoints toward the castle.
 export class Enemy {
-  constructor(scene, era, role, lane, hpMul) {
+  // mods: the wave's { hpMul, speedMul, rewardMul } — later waves are tougher, faster, and pay more.
+  constructor(scene, era, role, lane, mods) {
     const def = eraData(era).enemies[role];
     this.scene = scene;
     this.era = era;
     this.role = role;
-    this.maxHp = Math.round(def.hp * hpMul);
+    this.maxHp = Math.round(def.hp * mods.hpMul);
     this.hp = this.maxHp;
-    this.speed = def.speed;
+    this.speed = def.speed * mods.speedMul;
+    this.rewardMul = mods.rewardMul;
     this.damage = def.damage;
     this.points = lane.points;
     this.next = 1;

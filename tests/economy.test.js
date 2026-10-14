@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
+﻿import { describe, it, expect } from 'vitest';
 import { createState } from '../src/logic/state.js';
-import { clickCastle, buyTrap, placeTrap, addDrop, trapAt } from '../src/logic/economy.js';
+import { clickCastle, buyTrap, placeTrap, addDrop, trapAt, killReward } from '../src/logic/economy.js';
 import { BALANCE } from '../src/data/balance.js';
-import { trapDef } from '../src/data/eras.js';
+import { trapDef, ERAS } from '../src/data/eras.js';
 
 describe('createState', () => {
   it('starts in Era 1, Wave 1 with starting money and full castle health', () => {
@@ -90,5 +90,23 @@ describe('addDrop', () => {
     const s = createState();
     addDrop(s, { stone: 2, wood: 3, gold: 1 });
     expect([s.stone, s.wood, s.gold]).toEqual([2, 3, 1]);
+  });
+});
+
+describe('killReward', () => {
+  const enemies = ERAS[0].enemies;
+  it('gives money plus stone/wood/gold, and adds them all', () => {
+    const s = createState();
+    const r = killReward(enemies.fast, 1);
+    expect(r.money).toBe(enemies.fast.money);
+    addDrop(s, r);
+    expect(s.money).toBe(BALANCE.startMoney + r.money);
+    expect(s.wood).toBe(enemies.fast.drop.wood);
+  });
+
+  it('pays more for tougher enemies and later waves', () => {
+    expect(killReward(enemies.heavy, 1).money).toBeGreaterThan(killReward(enemies.standard, 1).money);
+    expect(killReward(enemies.standard, 1).money).toBeGreaterThan(killReward(enemies.fast, 1).money);
+    expect(killReward(enemies.fast, 2.5).money).toBeGreaterThan(killReward(enemies.fast, 1).money);
   });
 });

@@ -218,7 +218,7 @@ npm run preview  # check production build
     ["Buy a trap","Shop emits ui:buyTrap → economy.buyTrap checks money → Inventory +1 → state:changed.","ui/shop.js · logic/economy.js",["ui","bus","world"]],
     ["Place a trap","Tap → grid.cellAt → cell:tapped → picker opens → ui:placeTrap → Trap sprite placed, Inventory −1.","world/grid.js · ui/picker.js · world/Trap.js",["world","bus","ui"]],
     ["Waves","waves.buildWave → spawns at 4 edges → Enemy walks its lane → enters trap cell → combat.hitTrap (×3 vs counter), uses −1.","logic/waves.js · world/Enemy.js · logic/combat.js",["world"]],
-    ["Enemy dies","Drop added to stone/wood/gold, kills +1 → state:changed → HUD.","logic/economy.js · ui/hud.js",["world","bus","ui"]],
+    ["Enemy dies","Drop added to stone/wood/gold plus money (scaled by wave toughness), kills +1 → state:changed → HUD.","logic/economy.js · ui/hud.js",["world","bus","ui"]],
     ["Enemy reaches castle","combat.castleHit → health bar drops, enemy removed.","logic/combat.js · GameScene",["world"]],
     ["Upgrade","ui:upgrade → economy.applyUpgrade: spend, refund old traps, era bonus, refill health, era+1 → castle & scenery redrawn, Shop switches, next wave = Wave 1.","ui/upgrade.js · logic/economy.js · art/ · GameScene",["ui","bus","world"]],
     ["Wave 20 repeat","No upgrade after Wave 20 → wave manager repeats Wave 20.","logic/waves.js · GameScene",["world"]],

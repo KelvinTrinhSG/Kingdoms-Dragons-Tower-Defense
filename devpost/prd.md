@@ -17,7 +17,7 @@ Source: `scope.md > What "Working" Looks Like`.
 4. The player opens the **Shop** (button on the middle of the left edge), buys traps of the current era with money, and they go into the **Inventory**.
 5. The player taps a path cell. A picker shows the trap buttons available in the Inventory with their counts; tapping one places that trap on the cell.
 6. Waves start automatically. Enemies spawn at the map edges and walk the 4 paths toward the castle. Stepping on a trap damages the enemy and uses up one of the trap's uses.
-7. Killed enemies drop **stone, wood, and gold**, which are added to the player's resources.
+7. Killed enemies drop **stone, wood, and gold** plus some **money**, which are added to the player's resources.
 8. Enemies that reach the castle damage it and disappear.
 9. When the player has enough resources, they press **Upgrade** (above the castle's health bar) at any time. The castle evolves to the next era, its health is restored, the map's buildings and trees change to the new era, the Shop offers the new era's traps, and the next wave is **Wave 1 of the new era**. All old-era traps (on the map and in the Inventory) disappear and are converted into money, and the player gets a bonus worth 2 of the new era's cheapest trap.
 10. If the player finishes Wave 20 of an era without upgrading, the next waves keep repeating that era's Wave 20 until they upgrade.
@@ -71,11 +71,13 @@ Source: `scope.md > Inspiration & Identity`. Already decided in scope; not re-as
 
 ### Waves and Enemies
 - Waves start automatically one after another. Enemies come from all 4 directions.
-- Each era has **3 enemy types**. Each era has **20 waves**, getting harder as they go.
-- Killed enemies drop stone, wood, and gold.
+- Each era has **3 enemy types**. Each era has **20 waves**, getting harder as they go: early waves have few, slow, low-health enemies; each later wave brings more enemies that move faster and have more health.
+- Killed enemies drop stone, wood, and gold, plus money. Tougher enemies give more money: heavier types more than lighter ones, and later waves more than earlier ones.
 - An enemy reaching the castle damages it and disappears.
   - [ ] Enemies appear from all 4 map edges and walk the paths to the castle.
-  - [ ] Killing an enemy increases stone/wood/gold.
+  - [ ] Killing an enemy increases stone/wood/gold and money.
+  - [ ] A heavy enemy or a later-wave enemy gives more money than a light, early one.
+  - [ ] Wave 1 has fewer, slower, weaker enemies than later waves.
   - [ ] An enemy reaching the castle lowers the castle's health bar and vanishes.
 
 ### Speed Button
@@ -127,6 +129,7 @@ Pattern in every era: a fast/light enemy, a standard enemy, a heavy enemy; the c
 - Traps have limited uses; more expensive means more uses; the cheapest has 1 use.
 - Counter traps damage every enemy but deal extra damage to their countered type.
 - Each era has 20 waves; without upgrading, Wave 20 repeats — pushes the player to upgrade.
+- Killed enemies also drop money, more for tougher enemies; difficulty ramps from few/slow/weak to many/fast/tanky (learner feedback at the first hands-on checkpoint).
 - Upgrade can happen any time resources allow, even mid-era; the next wave becomes Wave 1 of the new era.
 - Upgrading restores castle health.
 - On upgrade, old-era traps (placed and in Inventory) disappear and are converted into money — the map is cleared for the new era without wasting the player's spending.
